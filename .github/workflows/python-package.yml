@@ -1,0 +1,117 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Python package
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [created]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.5', '3.6', '3.7', '3.8']
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Set proto path
+      run: echo "PROTO_FOLDER=backend-apis/gateway_to_backend/protocol_buffers_files" >> $GITHUB_ENV
+      
+    - name: Install Protoc
+      uses: arduino/setup-protoc@v1
+      with:
+         version: '3.14.0'
+
+    - name: Generate proto files
+      run: |
+        rm ${{ env.PROTO_FOLDER }}/nanopb.proto
+        protoc -I ${{ env.PROTO_FOLDER }} --python_out=./wirepas_mesh_messaging/proto ${{ env.PROTO_FOLDER }}/*.proto
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install flake8 pytest setuptools wheel
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Install wheel locally
+      run: pip install .
+      
+    - name: Test with pytest
+      run: |
+        pytest tests/
+
+    - name: Get short sha
+      uses: benjlevesque/short-sha@v1.2
+      id: short-sha
+      with:
+        length: 6
+
+    - name: Set Version for master push
+      if: ${{ github.event_name == 'push' }}
+      run: echo "VERSION=${{ steps.short-sha.outputs.sha }}" >> $GITHUB_ENV
+
+    - name: Set Version for release
+      if: ${{ github.event_name == 'release' }}
+      run: echo "VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+
+    - name: Set Version for PR
+      if: ${{ github.event_name == 'pull_request' }}
+      run: echo "VERSION=PR_${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+
+    - name: Set the version
+      run: |
+        sed -i '/__version__ = /c\__version__ = "${{ env.VERSION }}"' wirepas_mesh_messaging/__about__.py
+
+    - name: Build the wheel
+      run: python setup.py sdist bdist_wheel
+    
+    - name: Save produced wheel name and path
+      run: echo "WHEEL_FILE=$(ls dist/*-py3-none-any.whl)" >> $GITHUB_ENV
+      
+    - name: Store artifacts only for last matrix version
+      if: ${{ matrix.python-version == '3.8' }}
+      uses: actions/upload-artifact@v2
+      with:
+        path: ${{ env.WHEEL_FILE }}
+
+    # Produced wheels is same independently of python version
+    - name: Upload Wheel for releases only for last matrix version
+      if: ${{ github.event_name == 'release' && matrix.python-version == '3.8' }}
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ${{ env.WHEEL_FILE }}
+        asset_content_type: application/zip
+        asset_name: wirepas_mesh_messaging-${{ env.VERSION }}-py3-none-any.whl
+
+    - name: Publish package to TestPyPI
+      if: ${{ github.event_name == 'release' && matrix.python-version == '3.8' }}
+      uses: pypa/gh-action-pypi-publish@v1.4.1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_TEST_PWD }}
+        repository_url: https://test.pypi.org/legacy/

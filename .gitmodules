@@ -1,0 +1,3 @@
+[submodule "backend-apis"]
+	path = backend-apis
+	url = https://github.com/wirepas/backend-apis/
