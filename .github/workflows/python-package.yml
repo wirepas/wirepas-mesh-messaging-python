@@ -15,7 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.5', '3.6', '3.7', '3.8']
+        python-version: ['3.8']
+        #python-version: ['3.5', '3.6', '3.7', '3.8']
 
     steps:
     - uses: actions/checkout@v2
@@ -27,9 +28,11 @@ jobs:
       uses: arduino/setup-protoc@v1
       with:
          version: '3.6.1'
+    - name: Debug
+      run: ls ${{ env.PROTO_FOLDER }}
     - name: Generate proto files
       run: |
-        rm ${{ env.PROTO_FOLDER }}/nanopb.protoi
+        rm ${{ env.PROTO_FOLDER }}/nanopb.proto
         protoc -I ${{ env.PROTO_FOLDER }} --python_out=./wirepas_mesh_messaging/proto ${{ env.PROTO_FOLDER }}/*.proto
     - name: Debug
       run: ls ./wirepas_mesh_messaging/proto
