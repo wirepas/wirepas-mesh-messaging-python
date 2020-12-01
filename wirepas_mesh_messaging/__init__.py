@@ -23,7 +23,7 @@ from .get_configs import GetConfigsRequest, GetConfigsResponse
 from .get_gw_info import GetGatewayInfoRequest, GetGatewayInfoResponse
 from .set_config import SetConfigRequest, SetConfigResponse
 from .received_data import ReceivedDataEvent
-from .status import StatusEvent
+from .status import StatusEvent, GatewayState
 from .send_data import SendDataRequest, SendDataResponse
 from .upload_scratchpad import UploadScratchpadRequest, UploadScratchpadResponse
 from .process_scratchpad import ProcessScratchpadRequest, ProcessScratchpadResponse
