@@ -10,6 +10,11 @@ on:
     branches: [ main ]
   release:
     types: [created]
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'Version used on testPypi'
+        required: true
 
 jobs:
   build:
@@ -79,6 +84,10 @@ jobs:
     - name: Set Version for PR
       if: ${{ github.event_name == 'pull_request' }}
       run: echo "VERSION=PR_${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+    
+    - name: Set Version for manual triggering
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      run: echo "VERSION=${{ github.event.inputs.version_name }}" >> $GITHUB_ENV
 
     - name: Set the version
       run: |
@@ -109,7 +118,7 @@ jobs:
         asset_name: wirepas_mesh_messaging-${{ env.VERSION }}-py3-none-any.whl
 
     - name: Publish package to TestPyPI for push to master
-      if: ${{ github.event_name == 'push' && matrix.python-version == '3.8' }}
+      if: ${{ github.event_name == 'workflow_dispatch' && matrix.python-version == '3.8' }}
       uses: pypa/gh-action-pypi-publish@v1.4.1
       with:
         user: __token__
