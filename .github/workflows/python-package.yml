@@ -108,10 +108,17 @@ jobs:
         asset_content_type: application/zip
         asset_name: wirepas_mesh_messaging-${{ env.VERSION }}-py3-none-any.whl
 
-    - name: Publish package to TestPyPI
-      if: ${{ github.event_name == 'release' && matrix.python-version == '3.8' }}
+    - name: Publish package to TestPyPI for push to master
+      if: ${{ github.event_name == 'push' && matrix.python-version == '3.8' }}
       uses: pypa/gh-action-pypi-publish@v1.4.1
       with:
         user: __token__
         password: ${{ secrets.PYPI_TEST_PWD }}
         repository_url: https://test.pypi.org/legacy/
+        
+    - name: Publish package to PyPI for release
+      if: ${{ github.event_name == 'release' && matrix.python-version == '3.8' }}
+      uses: pypa/gh-action-pypi-publish@v1.4.1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_PWD }}
