@@ -28,8 +28,9 @@ from .send_data import SendDataRequest, SendDataResponse
 from .upload_scratchpad import UploadScratchpadRequest, UploadScratchpadResponse
 from .process_scratchpad import ProcessScratchpadRequest, ProcessScratchpadResponse
 from .get_scratchpad_status import GetScratchpadStatusRequest, GetScratchpadStatusResponse
+from .set_scratchpad_target import SetScratchpadTargetAndActionRequest, SetScratchpadTargetAndActionResponse
 from .gateway_result_code import GatewayResultCode
-from .otap_helper import ScratchpadStatus, ScratchpadType
+from .otap_helper import ScratchpadStatus, ScratchpadType, ScratchpadAction, ProcessingDelay
 from .wirepas_exceptions import GatewayAPIParsingException
 
 from google.protobuf.internal import api_implementation

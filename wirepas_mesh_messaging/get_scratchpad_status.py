@@ -16,7 +16,7 @@ from .otap_helper import (
     set_scratchpad_info,
     parse_scratchpad_info,
     ScratchpadStatus,
-    ScratchpadType,
+    ScratchpadType, parse_scratchpad_target, set_scratchpad_target,
 )
 from .gateway_result_code import GatewayResultCode
 from .wirepas_exceptions import GatewayAPIParsingException
@@ -70,10 +70,11 @@ class GetScratchpadStatusResponse(Response):
         gw_id (str): gateway unique identifier
         res (GatewayResultCode): result of the operation
         sink_id (str): id of the sink (dependant on gateway)
-        stored_scratchpad(dict): dictionnary containing description of stored scratchpad
+        stored_scratchpad(dict): dictionary containing description of stored scratchpad
         stored_status(ScratchpadStatus): status of stored scratchpad
         stored_type(ScratchpadType): type of stored scratchpad
-        process_scratchpad(dic): dictionnary containing description of processed scratchpad
+        process_scratchpad(dic): dictionary containing description of processed scratchpad
+        target_scratchpad_and_action(dic): dictionary containing target scratchpad and associated action
         firmware_area_id(int): current firmware area id
     """
 
@@ -88,6 +89,7 @@ class GetScratchpadStatusResponse(Response):
         stored_type=None,
         processed_scratchpad=None,
         firmware_area_id=None,
+        target_scratchpad_and_action=None,
         **kwargs
     ):
         super(GetScratchpadStatusResponse, self).__init__(req_id, gw_id, res, sink_id)
@@ -96,6 +98,7 @@ class GetScratchpadStatusResponse(Response):
         self.stored_type = stored_type
         self.processed_scratchpad = processed_scratchpad
         self.firmware_area_id = firmware_area_id
+        self.target_scratchpad_and_action = target_scratchpad_and_action
 
     @classmethod
     def from_payload(cls, payload):
@@ -117,6 +120,7 @@ class GetScratchpadStatusResponse(Response):
         stored_status = None
         stored_type = None
         firmware_area_id = None
+        target_scratchpad_and_action = None
 
         if response.HasField("stored_scratchpad"):
             stored_scratchpad = dict()
@@ -135,6 +139,10 @@ class GetScratchpadStatusResponse(Response):
         if response.HasField("firmware_area_id"):
             firmware_area_id = response.firmware_area_id
 
+        if response.HasField("target_and_action"):
+            target_scratchpad_and_action = dict()
+            parse_scratchpad_target(response.target_and_action, target_scratchpad_and_action)
+
         return cls(
             d["req_id"],
             d["gw_id"],
@@ -145,6 +153,7 @@ class GetScratchpadStatusResponse(Response):
             stored_type,
             processed_scratchpad,
             firmware_area_id,
+            target_scratchpad_and_action,
         )
 
     @property
@@ -174,5 +183,8 @@ class GetScratchpadStatusResponse(Response):
 
         if self.firmware_area_id is not None:
             response.firmware_area_id = self.firmware_area_id
+
+        if self.target_scratchpad_and_action is not None:
+            set_scratchpad_target(response.target_and_action, self.target_scratchpad_and_action)
 
         return message.SerializeToString()

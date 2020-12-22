@@ -30,6 +30,16 @@ SCRATCHPAD = bytes(bytearray(1024))
 
 SCRATCHPAD_INFO = dict([("len", 2032), ("crc", 0x1234), ("seq", 112)])
 
+SCRATCHPAD_TARGET_RAW = dict([("action", wirepas_mesh_messaging.ScratchpadAction.ACTION_PROPAGATE_AND_PROCESS),
+                          ("target_sequence", 18),
+                          ("param", 123)])
+
+SCRATCHPAD_TARGET_DELAY = dict([("action", wirepas_mesh_messaging.ScratchpadAction.ACTION_PROPAGATE_AND_PROCESS_WITH_DELAY),
+                          ("target_sequence", 18),
+                          ("delay", wirepas_mesh_messaging.ProcessingDelay.DELAY_FIVE_DAYS)])
+
+SCRATCHPAD_TARGET_MIN = dict([("action", wirepas_mesh_messaging.ScratchpadAction.ACTION_PROPAGATE_ONLY)])
+
 SCRATCHPAD_STATUS = wirepas_mesh_messaging.ScratchpadStatus.SCRATCHPAD_STATUS_SUCCESS
 SCRATCHPAD_TYPE = wirepas_mesh_messaging.ScratchpadType.SCRATCHPAD_TYPE_PRESENT
 FIRMWARE_AREA_ID = 0x123456
