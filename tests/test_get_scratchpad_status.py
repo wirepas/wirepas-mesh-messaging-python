@@ -30,6 +30,7 @@ def test_generate_parse_response():
         SCRATCHPAD_TYPE,
         SCRATCHPAD_INFO,
         FIRMWARE_AREA_ID,
+        SCRATCHPAD_TARGET_DELAY,
     )
 
     request2 = wirepas_mesh_messaging.GetScratchpadStatusResponse.from_payload(
