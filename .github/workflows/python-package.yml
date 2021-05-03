@@ -192,7 +192,7 @@ jobs:
       with:
         context: .
         file: docker/Dockerfile
-        platforms: linux/amd64,linux/arm
+        platforms: linux/amd64, linux/arm64, linux/arm/v7, linux/arm/v6
         push: ${{ env.PUSH }}
         build-args: WIREPAS_MESH_MESSAGING_BUIL_SHA1=${{ github.sha }}
         tags: |
