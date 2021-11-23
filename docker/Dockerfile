@@ -13,7 +13,7 @@ WORKDIR /home/wirepas
 
 # Protobuf checkout
 RUN git clone https://github.com/protocolbuffers/protobuf.git
-RUN cd protobuf && git checkout v3.12.0
+RUN cd protobuf && git checkout v3.12.2
 WORKDIR /home/wirepas/protobuf/python
 
 RUN export LD_LIBRARY_PATH=/usr/lib/
