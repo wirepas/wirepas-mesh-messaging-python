@@ -32,6 +32,7 @@ from .set_scratchpad_target import SetScratchpadTargetAndActionRequest, SetScrat
 from .gateway_result_code import GatewayResultCode
 from .otap_helper import ScratchpadStatus, ScratchpadType, ScratchpadAction, ProcessingDelay
 from .wirepas_exceptions import GatewayAPIParsingException
+from .generic_collection import GenericCollection
 
 from google.protobuf.internal import api_implementation
 
