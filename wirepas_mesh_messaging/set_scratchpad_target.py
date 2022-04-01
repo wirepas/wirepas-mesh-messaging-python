@@ -7,8 +7,6 @@
         See file LICENSE for full license details.
 """
 
-from .proto import GenericMessage
-
 from .request import Request
 from .response import Response
 
@@ -18,7 +16,6 @@ from .otap_helper import (
     ScratchpadAction
 )
 from .gateway_result_code import GatewayResultCode
-from .wirepas_exceptions import GatewayAPIParsingException
 
 
 class SetScratchpadTargetAndActionRequest(Request):
@@ -81,16 +78,7 @@ class SetScratchpadTargetAndActionRequest(Request):
         self.target = target
 
     @classmethod
-    def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException(
-                "Cannot parse SetScratchpadTargetAndActionRequest payload"
-            )
-
+    def from_generic_message(cls, message):
         req = message.wirepas.set_scratchpad_target_and_action_req
 
         d = Request._parse_request_header(req.header)
@@ -102,16 +90,14 @@ class SetScratchpadTargetAndActionRequest(Request):
                    target=target,
                    req_id=d["req_id"])
 
-    @property
-    def payload(self):
-        message = GenericMessage()
+    def load_generic_message(self, message):
         # Fill the request header
         req = message.wirepas.set_scratchpad_target_and_action_req
         self._load_request_header(req)
 
         set_scratchpad_target(req.target_and_action, self.target)
 
-        return message.SerializeToString()
+        return message
 
 
 class SetScratchpadTargetAndActionResponse(Response):
@@ -129,25 +115,15 @@ class SetScratchpadTargetAndActionResponse(Response):
         super(SetScratchpadTargetAndActionResponse, self).__init__(req_id, gw_id, res, sink_id, **kwargs)
 
     @classmethod
-    def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException("Cannot parse SetScratchpadTargetAndActionResponse payload")
-
+    def from_generic_message(cls, message):
         response = message.wirepas.set_scratchpad_target_and_action_resp
 
         d = Response._parse_response_header(response.header)
 
         return cls(d["req_id"], d["gw_id"], d["res"], d["sink_id"])
 
-    @property
-    def payload(self):
-        message = GenericMessage()
-
+    def load_generic_message(self, message):
         response = message.wirepas.set_scratchpad_target_and_action_resp
         self._load_response_header(response)
 
-        return message.SerializeToString()
+        return message

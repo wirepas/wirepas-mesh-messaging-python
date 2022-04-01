@@ -7,8 +7,6 @@
         See file LICENSE for full license details.
 """
 
-from .proto import GenericMessage
-
 from .request import Request
 from .response import Response
 
@@ -19,7 +17,6 @@ from .otap_helper import (
     ScratchpadType, parse_scratchpad_target, set_scratchpad_target,
 )
 from .gateway_result_code import GatewayResultCode
-from .wirepas_exceptions import GatewayAPIParsingException
 
 
 class GetScratchpadStatusRequest(Request):
@@ -35,30 +32,19 @@ class GetScratchpadStatusRequest(Request):
         super(GetScratchpadStatusRequest, self).__init__(sink_id, req_id, **kwargs)
 
     @classmethod
-    def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException(
-                "Cannot parse GetScratchpadStatusRequest payload"
-            )
-
+    def from_generic_message(cls, message):
         req = message.wirepas.get_scratchpad_status_req
 
         d = Request._parse_request_header(req.header)
 
         return cls(d["sink_id"], d["req_id"])
 
-    @property
-    def payload(self):
-        message = GenericMessage()
+    def load_generic_message(self, message):
         # Fill the request header
         req = message.wirepas.get_scratchpad_status_req
         self._load_request_header(req)
 
-        return message.SerializeToString()
+        return message
 
 
 class GetScratchpadStatusResponse(Response):
@@ -101,16 +87,7 @@ class GetScratchpadStatusResponse(Response):
         self.target_scratchpad_and_action = target_scratchpad_and_action
 
     @classmethod
-    def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException(
-                "Cannot parse GetScratchpadStatusResponse payload"
-            )
-
+    def from_generic_message(cls, message):
         response = message.wirepas.get_scratchpad_status_resp
 
         d = Response._parse_response_header(response.header)
@@ -156,10 +133,7 @@ class GetScratchpadStatusResponse(Response):
             target_scratchpad_and_action,
         )
 
-    @property
-    def payload(self):
-        message = GenericMessage()
-
+    def load_generic_message(self, message):
         response = message.wirepas.get_scratchpad_status_resp
         self._load_response_header(response)
 
@@ -187,4 +161,4 @@ class GetScratchpadStatusResponse(Response):
         if self.target_scratchpad_and_action is not None:
             set_scratchpad_target(response.target_and_action, self.target_scratchpad_and_action)
 
-        return message.SerializeToString()
+        return message

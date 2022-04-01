@@ -7,10 +7,7 @@
         See file LICENSE for full license details.
 """
 
-from .proto import GenericMessage
-
 from .event import Event
-from .wirepas_exceptions import GatewayAPIParsingException
 
 
 class ReceivedDataEvent(Event):
@@ -73,14 +70,7 @@ class ReceivedDataEvent(Event):
         self.network_address = network_address
 
     @classmethod
-    def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException("Cannot parse ReceivedDataEvent payload")
-
+    def from_generic_message(cls, message):
         event = message.wirepas.packet_received_event
         d = Event._parse_event_header(event.header)
 
@@ -128,9 +118,7 @@ class ReceivedDataEvent(Event):
             network_address=network_address
         )
 
-    @property
-    def payload(self):
-        message = GenericMessage()
+    def load_generic_message(self, message):
         # Fill the event header
         event = message.wirepas.packet_received_event
         self._load_event_header(event)
@@ -155,4 +143,4 @@ class ReceivedDataEvent(Event):
         if self.network_address is not None:
             event.network_address = self.network_address
 
-        return message.SerializeToString()
+        return message

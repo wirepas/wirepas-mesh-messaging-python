@@ -9,9 +9,10 @@
 
 import random
 from .proto import RequestHeader
+from .generic_message import GenericMessage
 
 
-class Request(object):
+class Request(GenericMessage):
     """
     Request
 
@@ -27,14 +28,6 @@ class Request(object):
         if req_id is None:
             req_id = random.getrandbits(64)
         self.req_id = req_id
-
-    def __str__(self):
-        return str(self.__dict__)
-
-    @property
-    def payload(self):
-        """ Implement how to serialize child Event classes """
-        raise NotImplementedError()
 
     def _load_request_header(self, request):
         header = request.header

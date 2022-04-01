@@ -7,8 +7,6 @@
         See file LICENSE for full license details.
 """
 
-from .proto import GenericMessage
-
 from .request import Request
 from .response import Response
 
@@ -18,7 +16,6 @@ from .config_helper import (
     set_config_ro,
     set_config_rw,
 )
-from .wirepas_exceptions import GatewayAPIParsingException
 
 
 class GetConfigsRequest(Request):
@@ -33,25 +30,16 @@ class GetConfigsRequest(Request):
         super(GetConfigsRequest, self).__init__(req_id=req_id, **kwargs)
 
     @classmethod
-    def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException("Cannot parse GetConfigsRequest payload")
-
+    def from_generic_message(cls, message):
         d = Request._parse_request_header(message.wirepas.get_configs_req.header)
         return cls(d["req_id"])
 
-    @property
-    def payload(self):
-        message = GenericMessage()
+    def load_generic_message(self, message):
         # Fill the request header
         get_config = message.wirepas.get_configs_req
         self._load_request_header(get_config)
 
-        return message.SerializeToString()
+        return message
 
 
 class GetConfigsResponse(Response):
@@ -70,14 +58,7 @@ class GetConfigsResponse(Response):
         self.configs = configs
 
     @classmethod
-    def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException("Cannot parse GetConfigsResponse payload")
-
+    def from_generic_message(cls, message):
         response = message.wirepas.get_configs_resp
 
         d = Response._parse_response_header(response.header)
@@ -96,10 +77,7 @@ class GetConfigsResponse(Response):
 
         return cls(d["req_id"], d["gw_id"], d["res"], configs)
 
-    @property
-    def payload(self):
-        message = GenericMessage()
-
+    def load_generic_message(self, message):
         response = message.wirepas.get_configs_resp
         self._load_response_header(response)
 
@@ -110,4 +88,4 @@ class GetConfigsResponse(Response):
             set_config_rw(conf, config)
             set_config_ro(conf, config)
 
-        return message.SerializeToString()
+        return message
