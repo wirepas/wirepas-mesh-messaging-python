@@ -32,6 +32,7 @@ class ReceivedDataEvent(Event):
         event_id(int): event unique id (random value generated if None)
         hop_count(int): number of hop for the message to reach the gateway
         network_address(int): network_address of this message
+        time_ms_epoch(int): timestamp in ms of event generation
     """
 
     def __init__(
@@ -50,10 +51,11 @@ class ReceivedDataEvent(Event):
         event_id=None,
         hop_count=0,
         network_address=None,
+        time_ms_epoch=None,
         **kwargs
     ):
         super(ReceivedDataEvent, self).__init__(
-            gw_id, sink_id, event_id=event_id, **kwargs
+            gw_id, sink_id, event_id=event_id, time_ms_epoch=time_ms_epoch, **kwargs
         )
         self.sink_id = sink_id
         self.rx_time_ms_epoch = rx_time_ms_epoch
@@ -125,7 +127,8 @@ class ReceivedDataEvent(Event):
             data_size=payload_size,
             event_id=d["event_id"],
             hop_count=hop_count,
-            network_address=network_address
+            network_address=network_address,
+            time_ms_epoch=d["time_ms_epoch"]
         )
 
     @property

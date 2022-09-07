@@ -46,10 +46,12 @@ class SetConfigRequest(Request):
                 Note: app_config_data/app_config_seq/app_config_data must all be defined to change one of them
                       only relevant keys for new config has to be defined
         req_id (int): unique request id
+        time_ms_epoch(int): timestamp in ms of request generation
+
     """
 
-    def __init__(self, sink_id, new_config, req_id=None, **kwargs):
-        super(SetConfigRequest, self).__init__(req_id=req_id, **kwargs)
+    def __init__(self, sink_id, new_config, req_id=None, time_ms_epoch=None, **kwargs):
+        super(SetConfigRequest, self).__init__(req_id=req_id, time_ms_epoch=time_ms_epoch, **kwargs)
         self.sink_id = sink_id
         self.new_config = new_config
 
@@ -74,7 +76,7 @@ class SetConfigRequest(Request):
         parse_config_rw(req.config, new_config)
         parse_config_keys(req.config, new_config)
 
-        return cls(req.config.sink_id, new_config, d["req_id"])
+        return cls(req.config.sink_id, new_config, d["req_id"], time_ms_epoch=d["time_ms_epoch"])
 
     @property
     def payload(self):
@@ -128,7 +130,7 @@ class SetConfigResponse(Response):
         parse_config_ro(response.config, new_config)
         parse_config_rw(response.config, new_config)
 
-        return cls(d["req_id"], d["gw_id"], d["res"], d["sink_id"], new_config)
+        return cls(d["req_id"], d["gw_id"], d["res"], d["sink_id"], new_config, time_ms_epoch=d["time_ms_epoch"])
 
     @property
     def payload(self):

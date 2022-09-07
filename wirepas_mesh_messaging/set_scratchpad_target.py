@@ -35,13 +35,16 @@ class SetScratchpadTargetAndActionRequest(Request):
                 param(int): raw parameter for action
                 delay(ProcessingDelay): delay for WITH_DELAY action
         req_id (int): unique request id
+        time_ms_epoch(int): timestamp in ms of request generation
     """
 
     def __init__(self,
                  sink_id,
                  target,
-                 req_id=None, **kwargs):
-        super(SetScratchpadTargetAndActionRequest, self).__init__(sink_id, req_id, **kwargs)
+                 req_id=None,
+                 time_ms_epoch=None,
+                 **kwargs):
+        super(SetScratchpadTargetAndActionRequest, self).__init__(sink_id, req_id, time_ms_epoch=time_ms_epoch, **kwargs)
 
         if target["action"].value > 255:
             raise ValueError("Wrong Target action")
@@ -100,7 +103,8 @@ class SetScratchpadTargetAndActionRequest(Request):
 
         return cls(sink_id=d["sink_id"],
                    target=target,
-                   req_id=d["req_id"])
+                   req_id=d["req_id"],
+                   time_ms_epoch=d["time_ms_epoch"])
 
     @property
     def payload(self):
@@ -141,7 +145,7 @@ class SetScratchpadTargetAndActionResponse(Response):
 
         d = Response._parse_response_header(response.header)
 
-        return cls(d["req_id"], d["gw_id"], d["res"], d["sink_id"])
+        return cls(d["req_id"], d["gw_id"], d["res"], d["sink_id"], time_ms_epoch=d["time_ms_epoch"])
 
     @property
     def payload(self):

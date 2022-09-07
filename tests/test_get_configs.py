@@ -2,6 +2,7 @@
 
 import wirepas_mesh_messaging
 from default_value import *
+import time
 
 DUMMY_CONFIGS = [NODE_CONFIG_1]
 
