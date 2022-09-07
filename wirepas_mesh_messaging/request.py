@@ -8,8 +8,7 @@
 """
 
 import random
-from .proto import RequestHeader
-
+import time
 
 class Request(object):
     """
@@ -18,15 +17,19 @@ class Request(object):
     Attributes:
         sink_id(str): sink identifier
         req_id (int): identifier to help distinguish a response/request pair
+        time_ms_epoch(int): timestamp in ms of request generation (0 to automatically set it, the default)
     """
 
     # pylint: disable=unused-argument
-    def __init__(self, sink_id=None, req_id=None, **kwargs):
+    def __init__(self, sink_id=None, req_id=None, time_ms_epoch=0, **kwargs):
         super(Request, self).__init__()
         self.sink_id = sink_id
         if req_id is None:
             req_id = random.getrandbits(64)
         self.req_id = req_id
+        if time_ms_epoch == 0:
+            time_ms_epoch = int(time.time() * 1000)
+        self.time_ms_epoch = time_ms_epoch
 
     def __str__(self):
         return str(self.__dict__)
@@ -42,6 +45,9 @@ class Request(object):
 
         if self.sink_id is not None:
             header.sink_id = str(self.sink_id)
+
+        if self.time_ms_epoch is not None:
+            header.time_ms_epoch = self.time_ms_epoch
 
     @staticmethod
     def _parse_request_header(header):
@@ -60,5 +66,10 @@ class Request(object):
             d["sink_id"] = header.sink_id
         else:
             d["sink_id"] = None
+
+        if header.HasField("time_ms_epoch"):
+            d["time_ms_epoch"] = header.time_ms_epoch
+        else:
+            d["time_ms_epoch"] = None
 
         return d

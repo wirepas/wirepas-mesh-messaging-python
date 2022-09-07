@@ -125,7 +125,8 @@ class ReceivedDataEvent(Event):
             data_size=payload_size,
             event_id=d["event_id"],
             hop_count=hop_count,
-            network_address=network_address
+            network_address=network_address,
+            time_ms_epoch=d["time_ms_epoch"]
         )
 
     @property

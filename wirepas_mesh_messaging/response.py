@@ -7,8 +7,8 @@
         See file LICENSE for full license details.
 """
 
-from .proto import ResponseHeader
 from .gateway_result_code import GatewayResultCode
+import time
 
 
 class Response(object):
@@ -20,15 +20,19 @@ class Response(object):
         sink_id(str): sink identifier
         req_id (int): identifier to help distinguish a response/request pair (same as in request)
         res(GatewayResultCode): result of the operation
+        time_ms_epoch(int): timestamp in ms of response generation (0 to automatically set it, the default)
     """
 
     # pylint: disable=unused-argument
-    def __init__(self, req_id, gw_id, res, sink_id=None, **kwargs):
+    def __init__(self, req_id, gw_id, res, sink_id=None, time_ms_epoch=0, **kwargs):
         super(Response, self).__init__()
         self.gw_id = gw_id
         self.sink_id = sink_id
         self.req_id = req_id
         self.res = res
+        if time_ms_epoch == 0:
+            time_ms_epoch = int(time.time() * 1000)
+        self.time_ms_epoch = time_ms_epoch
 
     def __str__(self):
         return str(self.__dict__)
@@ -48,6 +52,9 @@ class Response(object):
 
         if self.sink_id is not None:
             header.sink_id = str(self.sink_id)
+
+        if self.time_ms_epoch is not None:
+            header.time_ms_epoch = self.time_ms_epoch
 
     @staticmethod
     def _parse_response_header(header):
@@ -69,5 +76,10 @@ class Response(object):
             d["sink_id"] = header.sink_id
         else:
             d["sink_id"] = None
+
+        if header.HasField("time_ms_epoch"):
+            d["time_ms_epoch"] = header.time_ms_epoch
+        else:
+            d["time_ms_epoch"] = None
 
         return d
