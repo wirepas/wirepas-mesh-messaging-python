@@ -49,7 +49,7 @@ class GetScratchpadStatusRequest(Request):
 
         d = Request._parse_request_header(req.header)
 
-        return cls(d["sink_id"], d["req_id"])
+        return cls(d["sink_id"], d["req_id"], time_ms_epoch=d["time_ms_epoch"])
 
     @property
     def payload(self):
@@ -92,7 +92,7 @@ class GetScratchpadStatusResponse(Response):
         target_scratchpad_and_action=None,
         **kwargs
     ):
-        super(GetScratchpadStatusResponse, self).__init__(req_id, gw_id, res, sink_id)
+        super(GetScratchpadStatusResponse, self).__init__(req_id, gw_id, res, sink_id, **kwargs)
         self.stored_scratchpad = stored_scratchpad
         self.stored_status = stored_status
         self.stored_type = stored_type
@@ -154,6 +154,7 @@ class GetScratchpadStatusResponse(Response):
             processed_scratchpad,
             firmware_area_id,
             target_scratchpad_and_action,
+            time_ms_epoch=d["time_ms_epoch"]
         )
 
     @property

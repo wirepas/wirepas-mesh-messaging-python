@@ -38,7 +38,7 @@ class GetGatewayInfoRequest(Request):
             )
 
         d = Request._parse_request_header(message.wirepas.get_gateway_info_req.header)
-        return cls(d["req_id"])
+        return cls(d["req_id"], time_ms_epoch=d["time_ms_epoch"])
 
     @property
     def payload(self):
@@ -103,6 +103,7 @@ class GetGatewayInfoResponse(Response):
             gateway_model=response.info.gw_model,
             gateway_version=response.info.gw_version,
             implemented_api_version=response.info.implemented_api_version,
+            time_ms_epoch=d["time_ms_epoch"]
         )
 
     @property

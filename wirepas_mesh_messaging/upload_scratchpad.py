@@ -49,7 +49,7 @@ class UploadScratchpadRequest(Request):
             # Clear the scratchpad
             scratchpad = None
 
-        return cls(req.seq, d["sink_id"], d["req_id"], scratchpad)
+        return cls(req.seq, d["sink_id"], d["req_id"], scratchpad, time_ms_epoch=d["time_ms_epoch"])
 
     @property
     def payload(self):
@@ -96,7 +96,7 @@ class UploadScratchpadResponse(Response):
 
         d = Response._parse_response_header(response.header)
 
-        return cls(d["req_id"], d["gw_id"], d["res"], d["sink_id"])
+        return cls(d["req_id"], d["gw_id"], d["res"], d["sink_id"], time_ms_epoch=d["time_ms_epoch"])
 
     @property
     def payload(self):

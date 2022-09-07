@@ -41,7 +41,7 @@ class ProcessScratchpadRequest(Request):
 
         d = Request._parse_request_header(req.header)
 
-        return cls(d["sink_id"], d["req_id"])
+        return cls(d["sink_id"], d["req_id"], time_ms_epoch=d["time_ms_epoch"])
 
     @property
     def payload(self):
@@ -84,7 +84,7 @@ class ProcessScratchpadResponse(Response):
 
         d = Response._parse_response_header(response.header)
 
-        return cls(d["req_id"], d["gw_id"], d["res"], d["sink_id"])
+        return cls(d["req_id"], d["gw_id"], d["res"], d["sink_id"], time_ms_epoch=d["time_ms_epoch"])
 
     @property
     def payload(self):
