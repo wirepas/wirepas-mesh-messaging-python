@@ -13,8 +13,9 @@ from .proto import GenericMessage, ON, OFF
 from .event import Event
 from .wirepas_exceptions import GatewayAPIParsingException
 
-# This API should never be changes in future (prupose of protobuf)
-API_VERSION = 1
+# Indicates that protobuf message definition in version 1 can be parsed by this implementation
+# This API should never be changes in future (purpose of protobuf)
+PB_MESSAGE_DEFINITION_VERSION = 1
 
 
 class GatewayState(enum.Enum):
@@ -39,11 +40,11 @@ class StatusEvent(Event):
     Attributes:
         gw_id (str): gateway unique identifier
         state (GatewayState): state of the gateway
-        version (int): API version for gateway. Should be always 1
+        version (int): protobuf messsage definition version for the gateway. This implementation can only parse protobuf message definitions in version1
         event_id(int): event unique id (random value generated if None)
     """
 
-    def __init__(self, gw_id, state, version=API_VERSION, event_id=None, **kwargs):
+    def __init__(self, gw_id, state, version=PB_MESSAGE_DEFINITION_VERSION, event_id=None, **kwargs):
         super(StatusEvent, self).__init__(gw_id, event_id=event_id, **kwargs)
         self.state = state
         self.version = version
@@ -65,8 +66,8 @@ class StatusEvent(Event):
         else:
             online = GatewayState.OFFLINE
 
-        if event.version != API_VERSION:
-            raise RuntimeError("Wrong API version")
+        if event.version != PB_MESSAGE_DEFINITION_VERSION:
+            raise RuntimeError("Unsupported gateway message definition version. The only supported version is " + str(PB_MESSAGE_DEFINITION_VERSION))
 
         d = Event._parse_event_header(event.header)
         return cls(d["gw_id"], online, event_id=d["event_id"], time_ms_epoch=d["time_ms_epoch"])
@@ -80,7 +81,7 @@ class StatusEvent(Event):
         status = message.wirepas.status_event
         self._load_event_header(status)
 
-        status.version = API_VERSION
+        status.version = PB_MESSAGE_DEFINITION_VERSION
         if self.state == GatewayState.ONLINE:
             status.state = ON
         else:
