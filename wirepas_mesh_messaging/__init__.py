@@ -21,6 +21,7 @@ from .__about__ import (
 
 from .get_configs import GetConfigsRequest, GetConfigsResponse
 from .get_gw_info import GetGatewayInfoRequest, GetGatewayInfoResponse
+from .get_gw_status import GetGatewayStatusRequest, GetGatewayStatusResponse
 from .set_config import SetConfigRequest, SetConfigResponse
 from .received_data import ReceivedDataEvent
 from .status import StatusEvent, GatewayState
