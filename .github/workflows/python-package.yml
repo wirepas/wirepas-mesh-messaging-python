@@ -39,7 +39,7 @@ jobs:
     - name: Install Protoc
       uses: arduino/setup-protoc@v1
       with:
-         version: '3.21.9'
+         version: '4.21.9'
 
     - name: Generate proto files
       run: |
