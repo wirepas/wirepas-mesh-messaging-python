@@ -48,7 +48,7 @@ jobs:
         protoc -I ${{ env.PROTO_FOLDER }} --python_out=./wirepas_mesh_messaging/proto ${{ env.PROTO_FOLDER }}/*.proto
     
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
