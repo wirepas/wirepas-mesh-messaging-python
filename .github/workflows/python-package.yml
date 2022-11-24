@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.5', '3.6', '3.7', '3.8']
+        python-version: ['3.8', '3.9', '3.10', '3.11']
 
     steps:
     - uses: actions/checkout@v2
@@ -39,7 +39,7 @@ jobs:
     - name: Install Protoc
       uses: arduino/setup-protoc@v1
       with:
-         version: '3.14.0'
+         version: '3.19.0'
 
     - name: Generate proto files
       run: |
@@ -47,7 +47,7 @@ jobs:
         protoc -I ${{ env.PROTO_FOLDER }} --python_out=./wirepas_mesh_messaging/proto ${{ env.PROTO_FOLDER }}/*.proto
     
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
