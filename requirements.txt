@@ -1,3 +1,3 @@
-# Protobuf version above major version 4 require the file to be compiled with 
-# protoc 3.19 or newer.
-protobuf>4.0
+# 3.12.2 version is used as it is
+# the version available in alpine 3.12 (for protobuf cpp version)
+protobuf>=3.12.2,<4.0
