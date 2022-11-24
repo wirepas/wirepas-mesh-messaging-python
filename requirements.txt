@@ -1,3 +1,5 @@
-# 3.12.2 version is used as it is
-# the version available in alpine 3.12 (for protobuf cpp version)
-protobuf>=3.12.2,<4.0
+# Protobuf version above major version 4 require the file to be compiled with 
+# protoc 3.19 or newer.
+# TODO Alpine image currently support protoc 3.18+, so it is required to wait for an
+# alpine image with updated protoc before a new image can be generated
+protobuf>=4.0
