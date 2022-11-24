@@ -38,6 +38,8 @@ jobs:
       
     - name: Install Protoc
       uses: arduino/setup-protoc@v1
+      with:
+         version: '3.19.0'
       
     - name: Print the installed protoc version
       run: protoc --version
