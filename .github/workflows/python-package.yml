@@ -29,7 +29,7 @@ jobs:
         python-version: ['3.8', '3.9', '3.10', '3.11']
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
 
@@ -39,7 +39,7 @@ jobs:
     - name: Install Protoc
       uses: arduino/setup-protoc@v1
       with:
-         version: '3.14.0'
+         version: '3.20.3'
 
     - name: Generate proto files
       run: |
@@ -60,7 +60,7 @@ jobs:
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --select=E9,F63,F7,F82 --ignore=F821 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
@@ -72,7 +72,7 @@ jobs:
         pytest tests/
 
     - name: Get short sha
-      uses: benjlevesque/short-sha@v1.2
+      uses: benjlevesque/short-sha@v2.1
       id: short-sha
       with:
         length: 6
@@ -105,7 +105,7 @@ jobs:
       
     - name: Store artifacts only for last matrix version
       if: ${{ matrix.python-version == '3.8' }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: ${{ env.WHEEL_FILE }}
 
