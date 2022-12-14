@@ -1,19 +1,19 @@
-FROM python:3.8.8-alpine3.12 AS builder
+FROM python:3.10.8-alpine3.17 AS builder
 
 RUN adduser --disabled-password wirepas
 
 # Install required package to build protobuf lib
 RUN apk add --no-cache gcc bash build-base git protobuf make musl-dev python3-dev
-RUN ln -sf /usr/lib/libprotobuf.so.23 /usr/lib/libprotobuf.so
+RUN ln -sf /usr/lib/libprotobuf.so.32 /usr/lib/libprotobuf.so
 
 RUN python3 -m pip install wheel setuptools pkgconfig
 
 USER wirepas
 WORKDIR /home/wirepas
 
-# Protobuf checkout
+# Protobuf checkout and switch to tag that base image has (https://pkgs.alpinelinux.org/packages?name=protobuf&branch=v3.17&repo=&arch=&maintainer=)
 RUN git clone https://github.com/protocolbuffers/protobuf.git
-RUN cd protobuf && git checkout v3.12.2
+RUN cd protobuf && git checkout v21.9
 WORKDIR /home/wirepas/protobuf/python
 
 RUN export LD_LIBRARY_PATH=/usr/lib/
@@ -33,7 +33,7 @@ COPY ./artifact/wirepas_mesh_messaging*.whl .
 RUN pip3 install *.whl --user
 
 # Build the final image
-FROM python:3.8.8-alpine3.12 as tester
+FROM python:3.10.8-alpine3.17 as tester
 
 RUN adduser --disabled-password wirepas
 
@@ -54,7 +54,7 @@ COPY --from=builder /home/wirepas/.local /home/wirepas/.local
 RUN pytest -p no:cacheprovider ./tests
 
 # Build the final image
-FROM python:3.8.8-alpine3.12 as runner
+FROM python:3.10.8-alpine3.17 as runner
 
 # Variable set from CI
 ARG WIREPAS_MESH_MESSAGING_BUIL_SHA1=unset
