@@ -37,9 +37,10 @@ jobs:
       run: echo "PROTO_FOLDER=backend-apis/gateway_to_backend/protocol_buffers_files" >> $GITHUB_ENV
       
     - name: Install Protoc
-      uses: arduino/setup-protoc@v1
+      uses: arduino/setup-protoc@v1.1.2
       with:
          version: '3.20.3'
+         repo-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Generate proto files
       run: |
