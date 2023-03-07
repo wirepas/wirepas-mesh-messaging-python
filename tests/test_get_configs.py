@@ -3,7 +3,7 @@
 import wirepas_mesh_messaging
 from default_value import *
 
-DUMMY_CONFIGS = [NODE_CONFIG_1]
+DUMMY_CONFIGS = [NODE_CONFIG_2]
 
 
 def test_generate_parse_request():

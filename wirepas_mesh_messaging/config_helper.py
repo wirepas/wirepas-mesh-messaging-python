@@ -9,6 +9,13 @@
 
 from .proto import ON, OFF, NodeRole
 
+from .otap_helper import (
+    set_scratchpad_info,
+    parse_scratchpad_info,
+    ScratchpadStatus,
+    ScratchpadType, parse_scratchpad_target, set_scratchpad_target,
+)
+
 
 def convert_proto_role_to_wirepas(base, flags):
     """
@@ -149,6 +156,29 @@ def parse_config_rw(message_obj, dic):
     if message_obj.HasField("sink_state"):
         dic["started"] = message_obj.sink_state == ON
 
+def parse_config_otap(message_obj, dic):
+    if message_obj.HasField("stored_scratchpad"):
+        dic["stored_scratchpad"] = dict()
+        parse_scratchpad_info(message_obj.stored_scratchpad, dic["stored_scratchpad"])
+
+    if message_obj.HasField("processed_scratchpad"):
+        dic["processed_scratchpad"] = dict()
+        parse_scratchpad_info(message_obj.processed_scratchpad, dic["processed_scratchpad"])
+
+    if message_obj.HasField("stored_status"):
+        dic["stored_status"] = ScratchpadStatus(message_obj.stored_status)
+
+    if message_obj.HasField("stored_type"):
+        dic["stored_type"] = ScratchpadType(message_obj.stored_type)
+
+    if message_obj.HasField("firmware_area_id"):
+        dic["firmware_area_id"] = message_obj.firmware_area_id
+
+    if message_obj.HasField("target_and_action"):
+        dic["target_and_action"] = dict()
+        parse_scratchpad_target(message_obj.target_and_action, dic["target_and_action"])
+
+
 
 def set_config_rw(message_obj, dic):
     """
@@ -192,6 +222,25 @@ def set_config_rw(message_obj, dic):
     except KeyError:
         # Field is unknown, just skip it
         pass
+
+def set_config_otap(message_obj, dic):
+    if "stored_scratchpad" in dic:
+        set_scratchpad_info(message_obj.stored_scratchpad, dic["stored_scratchpad"])
+
+    if "processed_scratchpad" in dic:
+        set_scratchpad_info(message_obj.processed_scratchpad, dic["processed_scratchpad"])
+
+    if "stored_status" in dic:
+        message_obj.stored_status = dic["stored_status"].value
+
+    if "stored_type" in dic:
+        message_obj.stored_type = dic["stored_type"].value
+
+    if "firmware_area_id" in dic:
+        message_obj.firmware_area_id = dic["firmware_area_id"]
+
+    if "target_and_action" in dic:
+        set_scratchpad_target(message_obj.target_and_action, dic["target_and_action"])
 
 
 def parse_config_keys(message_obj, dic):

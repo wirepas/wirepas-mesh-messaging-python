@@ -15,8 +15,10 @@ from .response import Response
 from .config_helper import (
     parse_config_rw,
     parse_config_ro,
+    parse_config_otap,
     set_config_ro,
     set_config_rw,
+    set_config_otap,
 )
 from .wirepas_exceptions import GatewayAPIParsingException
 
@@ -91,6 +93,7 @@ class GetConfigsResponse(Response):
 
             parse_config_rw(conf, config)
             parse_config_ro(conf, config)
+            parse_config_otap(conf, config)
 
             configs.append(config)
 
@@ -109,5 +112,6 @@ class GetConfigsResponse(Response):
 
             set_config_rw(conf, config)
             set_config_ro(conf, config)
+            set_config_otap(conf, config)
 
         return message.SerializeToString()

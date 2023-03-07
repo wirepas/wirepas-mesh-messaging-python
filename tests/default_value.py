@@ -6,6 +6,7 @@ import wirepas_mesh_messaging
 GATEWAY_ID = "test_gateway"
 GATEWAY_STATE = wirepas_mesh_messaging.GatewayState.ONLINE
 SINK_ID = "sink3"
+SINK_ID_2 = "sink7"
 RES_OK = wirepas_mesh_messaging.GatewayResultCode.GW_RES_OK
 RES_KO = wirepas_mesh_messaging.GatewayResultCode.GW_RES_INTERNAL_ERROR
 REQUEST_ID = 1234567
@@ -26,6 +27,7 @@ IMPLEMENTED_API_VERSION = 0
 # Todo add more fields in config
 NODE_CONFIG_1 = dict([("sink_id", SINK_ID), ("node_address", 123)])
 
+
 SCRATCHPAD_SEQ = 12
 SCRATCHPAD = bytes(bytearray(1024))
 
@@ -44,3 +46,14 @@ SCRATCHPAD_TARGET_MIN = dict([("action", wirepas_mesh_messaging.ScratchpadAction
 SCRATCHPAD_STATUS = wirepas_mesh_messaging.ScratchpadStatus.SCRATCHPAD_STATUS_SUCCESS
 SCRATCHPAD_TYPE = wirepas_mesh_messaging.ScratchpadType.SCRATCHPAD_TYPE_PRESENT
 FIRMWARE_AREA_ID = 0x123456
+
+NODE_CONFIG_2 = dict(
+    [("sink_id", SINK_ID_2),
+     ("node_address", 456),
+     ("target_and_action", SCRATCHPAD_TARGET_DELAY),
+     ("firmware_area_id", FIRMWARE_AREA_ID),
+     ("stored_type", SCRATCHPAD_TYPE),
+     ("stored_status", SCRATCHPAD_STATUS),
+     ("processed_scratchpad", SCRATCHPAD_INFO),
+     ("stored_scratchpad", SCRATCHPAD_INFO)
+    ])
