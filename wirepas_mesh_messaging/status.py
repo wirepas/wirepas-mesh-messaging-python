@@ -61,9 +61,9 @@ class StatusEvent(Event):
         state,
         version=PB_MESSAGE_DEFINITION_VERSION,
         event_id=None,
-        sink_configs=[],
-        gateway_model='',
-        gateway_version='',
+        sink_configs=None,
+        gateway_model=None,
+        gateway_version=None,
         **kwargs
     ):
         super(StatusEvent, self).__init__(gw_id, event_id=event_id, **kwargs)
@@ -90,10 +90,18 @@ class StatusEvent(Event):
         else:
             online = GatewayState.OFFLINE
 
+        gw_model = None
+        if event.HasField("gw_model"):
+            gw_model = event.gw_model
+
+        gw_version = None
+        if event.HasField("gw_version"):
+            gw_version = event.gw_version
+
         if event.version != PB_MESSAGE_DEFINITION_VERSION:
             raise RuntimeError("Unsupported gateway message definition version. The only supported version is " + str(PB_MESSAGE_DEFINITION_VERSION))
 
-        configs = []
+        configs = None
         for conf in event.configs:
             config = {}
 
@@ -102,8 +110,11 @@ class StatusEvent(Event):
             parse_config_rw(conf, config)
             parse_config_ro(conf, config)
             parse_config_otap(conf, config)
-
-            configs.append(config)
+            try:
+                configs.append(config)
+            except AttributeError:
+                # First config
+                configs = [config]
 
         d = Event._parse_event_header(event.header)
         return cls(d["gw_id"],
@@ -111,8 +122,8 @@ class StatusEvent(Event):
                    event_id=d["event_id"],
                    sink_configs=configs,
                    time_ms_epoch=d["time_ms_epoch"],
-                   gateway_model=event.gw_model,
-                   gateway_version=event.gw_version)
+                   gateway_model=gw_model,
+                   gateway_version=gw_version)
 
     @property
     def payload(self):
