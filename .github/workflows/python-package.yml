@@ -54,7 +54,9 @@ jobs:
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
+        # Use sepcific version of pip as temporary fix for deprecation of setup.py install
+        # being an error in 23.1
+        python -m pip install pip==23.0
         python -m pip install flake8 pytest setuptools wheel
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
