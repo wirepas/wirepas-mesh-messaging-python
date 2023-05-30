@@ -37,8 +37,11 @@ from google.protobuf.internal import api_implementation
 
 # pylint: disable=locally-disabled, protected-access, wrong-import-order
 try:
-    if api_implementation._default_implementation_type == "python":
+    implementation = api_implementation.Type()
+    if implementation == "python":
         print(__warning_msg__)
+    else:
+        print("Using %s implementation for protobuf" % implementation)
 except AttributeError:
     print("Could not evaluate protobuf implementation type")
 
