@@ -1,2 +1,2 @@
-# Minimum of 3.19 as protoc useed needed it
-protobuf>=3.19.2
+# Minimum of 3.20.0 because we use google.protobuf.internal.builder
+protobuf>=3.20.0
