@@ -18,6 +18,8 @@ from .config_helper import (
     set_config_rw,
     set_config_keys,
     parse_config_ro,
+    parse_config_otap,
+    set_config_otap,
     set_config_ro,
 )
 from .wirepas_exceptions import GatewayAPIParsingException
@@ -128,6 +130,7 @@ class SetConfigResponse(Response):
         new_config["sink_id"] = response.config.sink_id
         parse_config_ro(response.config, new_config)
         parse_config_rw(response.config, new_config)
+        parse_config_otap(response.config, new_config)
 
         return cls(d["req_id"], d["gw_id"], d["res"], d["sink_id"], new_config, time_ms_epoch=d["time_ms_epoch"])
 
@@ -142,5 +145,6 @@ class SetConfigResponse(Response):
         if self.config is not None:
             set_config_rw(response.config, self.config)
             set_config_ro(response.config, self.config)
+            set_config_otap(response.config, self.config)
 
         return message.SerializeToString()
