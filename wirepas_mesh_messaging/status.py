@@ -99,7 +99,7 @@ class StatusEvent(Event):
             gw_version = event.gw_version
 
         if event.version != PB_MESSAGE_DEFINITION_VERSION:
-            raise RuntimeError("Unsupported gateway message definition version. The only supported version is " + str(PB_MESSAGE_DEFINITION_VERSION))
+            raise RuntimeError("Unsupported gateway message definition version {}. The only supported version is {}".format(event.version, str(PB_MESSAGE_DEFINITION_VERSION)))
 
         configs = None
         for conf in event.configs:
