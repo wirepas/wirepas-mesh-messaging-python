@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+        python-version: ['3.9', '3.10', '3.11']
 
     steps:
     - uses: actions/checkout@v3
@@ -35,7 +35,7 @@ jobs:
 
     - name: Set proto path
       run: echo "PROTO_FOLDER=backend-apis/gateway_to_backend/protocol_buffers_files" >> $GITHUB_ENV
-      
+
     - name: Install Protoc
       uses: arduino/setup-protoc@v1.1.2
       with:
@@ -44,9 +44,8 @@ jobs:
 
     - name: Generate proto files
       run: |
-        rm ${{ env.PROTO_FOLDER }}/nanopb.proto
         protoc -I ${{ env.PROTO_FOLDER }} --python_out=./wirepas_mesh_messaging/proto ${{ env.PROTO_FOLDER }}/*.proto
-    
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
@@ -69,7 +68,7 @@ jobs:
 
     - name: Install wheel locally
       run: pip install .
-      
+
     - name: Test with pytest
       run: |
         pytest tests/
@@ -91,7 +90,7 @@ jobs:
     - name: Set Version for PR
       if: ${{ github.event_name == 'pull_request' }}
       run: echo "VERSION=PR_${{ github.event.pull_request.number }}" >> $GITHUB_ENV
-    
+
     - name: Set Version for manual triggering
       if: ${{ github.event_name == 'workflow_dispatch' }}
       run: echo "VERSION=${{ github.event.inputs.version_name }}" >> $GITHUB_ENV
@@ -102,19 +101,19 @@ jobs:
 
     - name: Build the wheel
       run: python setup.py sdist bdist_wheel
-    
+
     - name: Save produced wheel name and path
       run: echo "WHEEL_FILE=$(ls dist/*-py3-none-any.whl)" >> $GITHUB_ENV
-      
+
     - name: Store artifacts only for last matrix version
-      if: ${{ matrix.python-version == '3.8' }}
+      if: ${{ matrix.python-version == '3.11' }}
       uses: actions/upload-artifact@v3
       with:
         path: ${{ env.WHEEL_FILE }}
 
     # Produced wheels is same independently of python version
     - name: Upload Wheel for releases only for last matrix version
-      if: ${{ github.event_name == 'release' && matrix.python-version == '3.8' }}
+      if: ${{ github.event_name == 'release' && matrix.python-version == '3.11' }}
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -125,15 +124,15 @@ jobs:
         asset_name: wirepas_mesh_messaging-${{ env.VERSION }}-py3-none-any.whl
 
     - name: Publish package to TestPyPI for push to master
-      if: ${{ github.event_name == 'workflow_dispatch' && matrix.python-version == '3.8' }}
+      if: ${{ github.event_name == 'workflow_dispatch' && matrix.python-version == '3.11' }}
       uses: pypa/gh-action-pypi-publish@v1.4.1
       with:
         user: __token__
         password: ${{ secrets.PYPI_TEST_PWD }}
         repository_url: https://test.pypi.org/legacy/
-        
+
     - name: Publish package to PyPI for release
-      if: ${{ github.event_name == 'release' && matrix.python-version == '3.8' }}
+      if: ${{ github.event_name == 'release' && matrix.python-version == '3.11' }}
       uses: pypa/gh-action-pypi-publish@v1.4.1
       with:
         user: __token__

@@ -64,6 +64,7 @@ class StatusEvent(Event):
         sink_configs=None,
         gateway_model=None,
         gateway_version=None,
+        max_scratchpad_size=None,
         **kwargs
     ):
         super(StatusEvent, self).__init__(gw_id, event_id=event_id, **kwargs)
@@ -72,6 +73,7 @@ class StatusEvent(Event):
         self.sink_configs = sink_configs
         self.gateway_model = gateway_model
         self.gateway_version = gateway_version
+        self.max_scratchpad_size = max_scratchpad_size
 
     @classmethod
     def from_payload(cls, payload):
@@ -98,6 +100,10 @@ class StatusEvent(Event):
         if event.HasField("gw_version"):
             gw_version = event.gw_version
 
+        max_scratchpad_size = None
+        if event.HasField("max_scratchpad_size"):
+            max_scratchpad_size = event.max_scratchpad_size
+
         if event.version != PB_MESSAGE_DEFINITION_VERSION:
             raise RuntimeError("Unsupported gateway message definition version {}. The only supported version is {}".format(event.version, str(PB_MESSAGE_DEFINITION_VERSION)))
 
@@ -123,7 +129,8 @@ class StatusEvent(Event):
                    sink_configs=configs,
                    time_ms_epoch=d["time_ms_epoch"],
                    gateway_model=gw_model,
-                   gateway_version=gw_version)
+                   gateway_version=gw_version,
+                   max_scratchpad_size=max_scratchpad_size)
 
     @property
     def payload(self):
@@ -154,5 +161,8 @@ class StatusEvent(Event):
 
         if self.gateway_version is not None:
             status.gw_version = self.gateway_version
+
+        if self.max_scratchpad_size is not None:
+            status.max_scratchpad_size = self.max_scratchpad_size
 
         return message.SerializeToString()
