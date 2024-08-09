@@ -61,6 +61,8 @@ class GetGatewayInfoResponse(Response):
         current_time_s_epoch (int): current timestamp in ms relative to epoch
         gateway_model (string): gateway model (managed by gateway integrator)
         gateway_version (string): gateway version (managed by gateway integrator)
+        max_scratchpad_size (int): max scratchpad size gateway support.
+             If bigger, transfer must happen as chunks, if None it is unlimited
     """
 
     def __init__(
@@ -71,6 +73,7 @@ class GetGatewayInfoResponse(Response):
         current_time_s_epoch,
         gateway_model=None,
         gateway_version=None,
+        max_scratchpad_size=None,
         implemented_api_version=None,
         **kwargs
     ):
@@ -79,6 +82,7 @@ class GetGatewayInfoResponse(Response):
         self.gateway_model = gateway_model
         self.gateway_version = gateway_version
         self.implemented_api_version = implemented_api_version
+        self.max_scratchpad_size = max_scratchpad_size
 
     @classmethod
     def from_payload(cls, payload):
@@ -95,6 +99,10 @@ class GetGatewayInfoResponse(Response):
 
         d = Response._parse_response_header(response.header)
 
+        max_size = response.info.max_scratchpad_size
+        if max_size == 0:
+            max_size = None
+
         return cls(
             d["req_id"],
             d["gw_id"],
@@ -103,6 +111,7 @@ class GetGatewayInfoResponse(Response):
             gateway_model=response.info.gw_model,
             gateway_version=response.info.gw_version,
             implemented_api_version=response.info.implemented_api_version,
+            max_scratchpad_size=max_size,
             time_ms_epoch=d["time_ms_epoch"]
         )
 
@@ -123,5 +132,8 @@ class GetGatewayInfoResponse(Response):
 
         if self.implemented_api_version is not None:
             response.info.implemented_api_version = self.implemented_api_version
+
+        if self.max_scratchpad_size is not None:
+            response.info.max_scratchpad_size = self.max_scratchpad_size
 
         return message.SerializeToString()

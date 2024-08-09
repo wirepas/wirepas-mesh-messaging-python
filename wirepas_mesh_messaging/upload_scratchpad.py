@@ -22,12 +22,17 @@ class UploadScratchpadRequest(Request):
         sink_id (str): id of the sink to upload scratchpad
         req_id (int): unique request id
         scratchpad (bytearray): scratchpad to upload (None to clear scratchpad)
+        chunk_info (dic): dictionary containing chunk info
+            Dict keys are:
+                total_size (int): full size of scratchpad
+                offset (int): target crc
     """
 
-    def __init__(self, seq, sink_id, req_id=None, scratchpad=None, **kwargs):
+    def __init__(self, seq, sink_id, req_id=None, scratchpad=None, chunk_info=None, **kwargs):
         super(UploadScratchpadRequest, self).__init__(sink_id, req_id, **kwargs)
         self.seq = seq
         self.scratchpad = scratchpad
+        self.chunk_info = chunk_info
 
     @classmethod
     def from_payload(cls, payload):
@@ -49,11 +54,18 @@ class UploadScratchpadRequest(Request):
             # Clear the scratchpad
             scratchpad = None
 
-        return cls(req.seq, d["sink_id"], d["req_id"], scratchpad, time_ms_epoch=d["time_ms_epoch"])
+        chunk_info = None
+        if req.HasField("chunk_info"):
+            chunk_info = {}
+            chunk_info["total_size"] = req.chunk_info.scratchpad_total_size
+            chunk_info["offset"] = req.chunk_info.start_offset
+
+        return cls(req.seq, d["sink_id"], d["req_id"], scratchpad, time_ms_epoch=d["time_ms_epoch"], chunk_info=chunk_info)
 
     @property
     def payload(self):
         message = GenericMessage()
+
         # Fill the request header
         req = message.wirepas.upload_scratchpad_req
         self._load_request_header(req)
@@ -61,6 +73,11 @@ class UploadScratchpadRequest(Request):
         req.seq = self.seq
         if self.scratchpad is not None:
             req.scratchpad = self.scratchpad
+
+
+        if self.chunk_info is not None:
+            req.chunk_info.scratchpad_total_size = self.chunk_info["total_size"]
+            req.chunk_info.start_offset = self.chunk_info["offset"]
 
         return message.SerializeToString()
 

@@ -20,7 +20,7 @@ __license__ = "Apache-2"
 __pkg_name__ = "wirepas_mesh_messaging"
 __title__ = "Wirepas Messaging For Mesh access"
 __url__ = "https://github.com/wirepas/backend-apis/tree/master/gateway_to_backend"
-__version__ = "set_by_GH_action"
+__version__ = "0.0.dev1"
 __warning_msg__ = """
 ***********************************************************************
 * WARNING:

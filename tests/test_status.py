@@ -20,3 +20,11 @@ def test_generate_parse_event_complete():
 
     for k, v in status.__dict__.items():
         assert v == status2.__dict__[k]
+
+def test_generate_parse_event_with_max_size():
+    status = wirepas_mesh_messaging.StatusEvent(GATEWAY_ID, GATEWAY_STATE, max_scratchpad_size=1024)
+
+    status2 = wirepas_mesh_messaging.StatusEvent.from_payload(status.payload)
+
+    for k, v in status.__dict__.items():
+        assert v == status2.__dict__[k]
