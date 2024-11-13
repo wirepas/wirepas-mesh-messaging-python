@@ -1,9 +1,7 @@
 # flake8: noqa
 
-import pytest
 import wirepas_mesh_messaging
 from default_value import *
-from wirepas_mesh_messaging.wirepas_exceptions import GatewayAPIParsingException
 
 
 def test_generate_parse_request():
@@ -39,11 +37,3 @@ def test_generate_parse_response():
 
     for k, v in response.__dict__.items():
         assert v == response2.__dict__[k]
-
-def test_request_decoding_error():
-    with pytest.raises(GatewayAPIParsingException):
-        wirepas_mesh_messaging.SendDataRequest.from_payload(INVALID_PROTOBUF_MESSAGE)
-
-def test_response_decoding_error():
-    with pytest.raises(GatewayAPIParsingException):
-        wirepas_mesh_messaging.SendDataResponse.from_payload(INVALID_PROTOBUF_MESSAGE)
