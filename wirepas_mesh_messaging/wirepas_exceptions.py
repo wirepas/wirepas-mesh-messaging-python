@@ -12,3 +12,8 @@ class GatewayAPIParsingException(Exception):
     """
     Wirepas Gateway API generic Exception
     """
+
+class InvalidMessageType(GatewayAPIParsingException):
+    """
+    Exception indicating wrong message type during deserialization
+    """

@@ -10,7 +10,7 @@
 from abc import ABC, abstractmethod
 
 from .proto import GenericMessage
-from .wirepas_exceptions import GatewayAPIParsingException
+from .wirepas_exceptions import GatewayAPIParsingException, InvalidMessageType
 
 
 class WirepasMessage(ABC):
@@ -66,5 +66,12 @@ class WirepasMessage(ABC):
             ) from e
 
         contained_message = cls._get_related_message(generic_message)
+
+        # Works by checking if all required fields of contained_message are
+        # set. In our case, every message holds a required header field.
+        if not contained_message.IsInitialized():
+            raise InvalidMessageType(
+                f"Could not find relevant Wirepas message for {cls.__name__}"
+            )
 
         return contained_message
