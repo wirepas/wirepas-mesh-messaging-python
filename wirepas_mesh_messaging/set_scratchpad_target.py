@@ -7,6 +7,7 @@
         See file LICENSE for full license details.
 """
 
+from wirepas_mesh_messaging.wirepas_exceptions import InvalidMessageContents
 from .proto import GenericMessage
 
 from .request import Request
@@ -86,15 +87,22 @@ class SetScratchpadTargetAndActionRequest(Request):
     def from_payload(cls, payload):
         req = cls._decode_and_get_related_message(payload)
 
-        d = Request._parse_request_header(req.header)
+        header = Request._parse_request_header(req.header)
 
         target = {}
         parse_scratchpad_target(req.target_and_action, target)
 
-        return cls(sink_id=d["sink_id"],
-                   target=target,
-                   req_id=d["req_id"],
-                   time_ms_epoch=d["time_ms_epoch"])
+        try:
+            return cls(
+                sink_id=header["sink_id"],
+                target=target,
+                req_id=header["req_id"],
+                time_ms_epoch=header["time_ms_epoch"],
+            )
+        except ValueError as e:
+            raise InvalidMessageContents(
+                f"Invalid values in {cls.__name__}", header
+            ) from e
 
     @property
     def payload(self):
