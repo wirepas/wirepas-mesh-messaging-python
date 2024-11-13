@@ -24,6 +24,8 @@ NETWORK_ADDRESS = 0x123456
 
 IMPLEMENTED_API_VERSION = 0
 
+INVALID_PROTOBUF_MESSAGE = bytes([0])
+
 # Todo add more fields in config
 NODE_CONFIG_1 = dict([("sink_id", SINK_ID), ("node_address", 123)])
 
