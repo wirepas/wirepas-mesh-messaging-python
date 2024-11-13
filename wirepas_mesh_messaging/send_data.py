@@ -12,8 +12,6 @@ from .proto import GenericMessage
 from .request import Request
 from .response import Response
 
-from .wirepas_exceptions import GatewayAPIParsingException
-
 
 class SendDataRequest(Request):
     """
@@ -56,16 +54,14 @@ class SendDataRequest(Request):
         self.is_unack_csma_ca = is_unack_csma_ca
         self.hop_limit = hop_limit
 
+    @staticmethod
+    def _get_related_message(generic_message):
+        return generic_message.wirepas.send_packet_req
+
     @classmethod
     def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException("Cannot parse SendDataRequest payload")
+        req = cls._decode_and_get_related_message(payload)
 
-        req = message.wirepas.send_packet_req
         d = Request._parse_request_header(req.header)
 
         # Handle optional fields
@@ -106,7 +102,7 @@ class SendDataRequest(Request):
         message = GenericMessage()
 
         # Fill the request header
-        req = message.wirepas.send_packet_req
+        req = self._get_related_message(message)
         self._load_request_header(req)
 
         req.destination_address = self.destination_address
@@ -142,16 +138,13 @@ class SendDataResponse(Response):
     def __init__(self, req_id, gw_id, res, sink_id, **kwargs):
         super(SendDataResponse, self).__init__(req_id, gw_id, res, sink_id, **kwargs)
 
+    @staticmethod
+    def _get_related_message(generic_message):
+        return generic_message.wirepas.send_packet_resp
+
     @classmethod
     def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException("Cannot parse SendDataResponse payload")
-
-        response = message.wirepas.send_packet_resp
+        response = cls._decode_and_get_related_message(payload)
 
         d = Response._parse_response_header(response.header)
 
@@ -161,7 +154,7 @@ class SendDataResponse(Response):
     def payload(self):
         message = GenericMessage()
 
-        response = message.wirepas.send_packet_resp
+        response = self._get_related_message(message)
         self._load_response_header(response)
 
         return message.SerializeToString()

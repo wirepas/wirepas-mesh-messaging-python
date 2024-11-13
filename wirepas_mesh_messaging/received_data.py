@@ -10,7 +10,6 @@
 from .proto import GenericMessage
 
 from .event import Event
-from .wirepas_exceptions import GatewayAPIParsingException
 
 
 class ReceivedDataEvent(Event):
@@ -72,16 +71,13 @@ class ReceivedDataEvent(Event):
         self.hop_count = hop_count
         self.network_address = network_address
 
+    @staticmethod
+    def _get_related_message(generic_message):
+        return generic_message.wirepas.packet_received_event
+
     @classmethod
     def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException("Cannot parse ReceivedDataEvent payload")
-
-        event = message.wirepas.packet_received_event
+        event = cls._decode_and_get_related_message(payload)
         d = Event._parse_event_header(event.header)
 
         # Check optional hop count field
@@ -133,7 +129,7 @@ class ReceivedDataEvent(Event):
     def payload(self):
         message = GenericMessage()
         # Fill the event header
-        event = message.wirepas.packet_received_event
+        event = self._get_related_message(message)
         self._load_event_header(event)
 
         event.source_address = self.source_address
