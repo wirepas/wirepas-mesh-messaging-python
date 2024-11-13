@@ -10,7 +10,10 @@
 import random
 import time
 
-class Request(object):
+from .wirepas_message import WirepasMessage
+
+
+class Request(WirepasMessage):
     """
     Request
 
@@ -33,11 +36,6 @@ class Request(object):
 
     def __str__(self):
         return str(self.__dict__)
-
-    @property
-    def payload(self):
-        """ Implement how to serialize child Event classes """
-        raise NotImplementedError()
 
     def _load_request_header(self, request):
         header = request.header

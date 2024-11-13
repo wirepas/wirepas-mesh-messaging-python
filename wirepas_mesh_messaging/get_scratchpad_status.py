@@ -19,7 +19,6 @@ from .otap_helper import (
     ScratchpadType, parse_scratchpad_target, set_scratchpad_target,
 )
 from .gateway_result_code import GatewayResultCode
-from .wirepas_exceptions import GatewayAPIParsingException
 
 
 class GetScratchpadStatusRequest(Request):
@@ -34,18 +33,13 @@ class GetScratchpadStatusRequest(Request):
     def __init__(self, sink_id, req_id=None, **kwargs):
         super(GetScratchpadStatusRequest, self).__init__(sink_id, req_id, **kwargs)
 
+    @staticmethod
+    def _get_related_message(generic_message):
+        return generic_message.wirepas.get_scratchpad_status_req
+
     @classmethod
     def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException(
-                "Cannot parse GetScratchpadStatusRequest payload"
-            )
-
-        req = message.wirepas.get_scratchpad_status_req
+        req = cls._decode_and_get_related_message(payload)
 
         d = Request._parse_request_header(req.header)
 
@@ -55,7 +49,7 @@ class GetScratchpadStatusRequest(Request):
     def payload(self):
         message = GenericMessage()
         # Fill the request header
-        req = message.wirepas.get_scratchpad_status_req
+        req = self._get_related_message(message)
         self._load_request_header(req)
 
         return message.SerializeToString()
@@ -100,18 +94,13 @@ class GetScratchpadStatusResponse(Response):
         self.firmware_area_id = firmware_area_id
         self.target_scratchpad_and_action = target_scratchpad_and_action
 
+    @staticmethod
+    def _get_related_message(generic_message):
+        return generic_message.wirepas.get_scratchpad_status_resp
+
     @classmethod
     def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException(
-                "Cannot parse GetScratchpadStatusResponse payload"
-            )
-
-        response = message.wirepas.get_scratchpad_status_resp
+        response = cls._decode_and_get_related_message(payload)
 
         d = Response._parse_response_header(response.header)
 
@@ -161,7 +150,7 @@ class GetScratchpadStatusResponse(Response):
     def payload(self):
         message = GenericMessage()
 
-        response = message.wirepas.get_scratchpad_status_resp
+        response = self._get_related_message(message)
         self._load_response_header(response)
 
         if self.res is not GatewayResultCode.GW_RES_OK:

@@ -12,8 +12,6 @@ from .proto import GenericMessage
 from .request import Request
 from .response import Response
 
-from .wirepas_exceptions import GatewayAPIParsingException
-
 
 class GetGatewayInfoRequest(Request):
     """
@@ -26,25 +24,22 @@ class GetGatewayInfoRequest(Request):
     def __init__(self, req_id=None, **kwargs):
         super(GetGatewayInfoRequest, self).__init__(req_id=req_id, **kwargs)
 
+    @staticmethod
+    def _get_related_message(generic_message):
+        return generic_message.wirepas.get_gateway_info_req
+
     @classmethod
     def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException(
-                "Cannot parse GetGatewayInfoRequest payload"
-            )
+        req = cls._decode_and_get_related_message(payload)
 
-        d = Request._parse_request_header(message.wirepas.get_gateway_info_req.header)
+        d = Request._parse_request_header(req.header)
         return cls(d["req_id"], time_ms_epoch=d["time_ms_epoch"])
 
     @property
     def payload(self):
         message = GenericMessage()
         # Fill the request header
-        get_gateway_info = message.wirepas.get_gateway_info_req
+        get_gateway_info = self._get_related_message(message)
         self._load_request_header(get_gateway_info)
 
         return message.SerializeToString()
@@ -84,18 +79,13 @@ class GetGatewayInfoResponse(Response):
         self.implemented_api_version = implemented_api_version
         self.max_scratchpad_size = max_scratchpad_size
 
+    @staticmethod
+    def _get_related_message(generic_message):
+        return generic_message.wirepas.get_gateway_info_resp
+
     @classmethod
     def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException(
-                "Cannot parse GetGatewayInfoResponse payload"
-            )
-
-        response = message.wirepas.get_gateway_info_resp
+        response = cls._decode_and_get_related_message(payload)
 
         d = Response._parse_response_header(response.header)
 
@@ -119,7 +109,7 @@ class GetGatewayInfoResponse(Response):
     def payload(self):
         message = GenericMessage()
 
-        response = message.wirepas.get_gateway_info_resp
+        response = self._get_related_message(message)
         self._load_response_header(response)
 
         response.info.current_time_s_epoch = self.current_time_s_epoch
