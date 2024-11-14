@@ -107,7 +107,7 @@ jobs:
 
     - name: Store artifacts only for last matrix version
       if: ${{ matrix.python-version == '3.11' }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         path: ${{ env.WHEEL_FILE }}
 
@@ -152,7 +152,7 @@ jobs:
       uses: docker/setup-buildx-action@v2
 
     - name: Retrieve wheel to be installed image
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
 
     - name: Set tag for push
       if: github.event_name == 'push'
