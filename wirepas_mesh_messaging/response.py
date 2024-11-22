@@ -7,11 +7,13 @@
         See file LICENSE for full license details.
 """
 
-from .gateway_result_code import GatewayResultCode
 import time
 
+from .gateway_result_code import GatewayResultCode
+from .wirepas_message import WirepasMessage
 
-class Response(object):
+
+class Response(WirepasMessage):
     """
     Response
 
@@ -36,11 +38,6 @@ class Response(object):
 
     def __str__(self):
         return str(self.__dict__)
-
-    @property
-    def payload(self):
-        """ Implement how to serialize child Event classes """
-        raise NotImplementedError()
 
     def _load_response_header(self, response):
         """ Creates the generic messaging header """

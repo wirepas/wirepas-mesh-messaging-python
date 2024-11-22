@@ -22,7 +22,6 @@ from .config_helper import (
     set_config_otap,
     set_config_ro,
 )
-from .wirepas_exceptions import GatewayAPIParsingException
 
 
 class SetConfigRequest(Request):
@@ -56,16 +55,13 @@ class SetConfigRequest(Request):
         self.sink_id = sink_id
         self.new_config = new_config
 
+    @staticmethod
+    def _get_related_message(generic_message):
+        return generic_message.wirepas.set_config_req
+
     @classmethod
     def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException("Cannot parse SetConfigRequest payload")
-
-        req = message.wirepas.set_config_req
+        req = cls._decode_and_get_related_message(payload)
 
         d = Request._parse_request_header(req.header)
 
@@ -83,7 +79,7 @@ class SetConfigRequest(Request):
     def payload(self):
         message = GenericMessage()
         # Fill the request header
-        set_config = message.wirepas.set_config_req
+        set_config = self._get_related_message(message)
         self._load_request_header(set_config)
 
         set_config.config.sink_id = self.sink_id
@@ -110,16 +106,13 @@ class SetConfigResponse(Response):
         # Config can be null in case of wrong sink_id for example
         self.config = config
 
+    @staticmethod
+    def _get_related_message(generic_message):
+        return generic_message.wirepas.set_config_resp
+
     @classmethod
     def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException("Cannot parse SetConfigResponse payload")
-
-        response = message.wirepas.set_config_resp
+        response = cls._decode_and_get_related_message(payload)
 
         d = Response._parse_response_header(response.header)
 
@@ -138,7 +131,7 @@ class SetConfigResponse(Response):
     def payload(self):
         message = GenericMessage()
 
-        response = message.wirepas.set_config_resp
+        response = self._get_related_message(message)
         self._load_response_header(response)
 
         response.config.sink_id = self.sink_id

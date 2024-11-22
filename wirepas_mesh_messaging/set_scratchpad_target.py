@@ -7,6 +7,7 @@
         See file LICENSE for full license details.
 """
 
+from wirepas_mesh_messaging.wirepas_exceptions import InvalidMessageContents
 from .proto import GenericMessage
 
 from .request import Request
@@ -15,10 +16,7 @@ from .response import Response
 from .otap_helper import (
     set_scratchpad_target,
     parse_scratchpad_target,
-    ScratchpadAction
 )
-from .gateway_result_code import GatewayResultCode
-from .wirepas_exceptions import GatewayAPIParsingException
 
 
 class SetScratchpadTargetAndActionRequest(Request):
@@ -81,34 +79,36 @@ class SetScratchpadTargetAndActionRequest(Request):
 
         self.target = target
 
+    @staticmethod
+    def _get_related_message(generic_message):
+        return generic_message.wirepas.set_scratchpad_target_and_action_req
+
     @classmethod
     def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException(
-                "Cannot parse SetScratchpadTargetAndActionRequest payload"
-            )
+        req = cls._decode_and_get_related_message(payload)
 
-        req = message.wirepas.set_scratchpad_target_and_action_req
-
-        d = Request._parse_request_header(req.header)
+        header = Request._parse_request_header(req.header)
 
         target = {}
         parse_scratchpad_target(req.target_and_action, target)
 
-        return cls(sink_id=d["sink_id"],
-                   target=target,
-                   req_id=d["req_id"],
-                   time_ms_epoch=d["time_ms_epoch"])
+        try:
+            return cls(
+                sink_id=header["sink_id"],
+                target=target,
+                req_id=header["req_id"],
+                time_ms_epoch=header["time_ms_epoch"],
+            )
+        except ValueError as e:
+            raise InvalidMessageContents(
+                f"Invalid values in {cls.__name__}", header
+            ) from e
 
     @property
     def payload(self):
         message = GenericMessage()
         # Fill the request header
-        req = message.wirepas.set_scratchpad_target_and_action_req
+        req = self._get_related_message(message)
         self._load_request_header(req)
 
         set_scratchpad_target(req.target_and_action, self.target)
@@ -130,16 +130,13 @@ class SetScratchpadTargetAndActionResponse(Response):
     def __init__(self, req_id, gw_id, res, sink_id, **kwargs):
         super(SetScratchpadTargetAndActionResponse, self).__init__(req_id, gw_id, res, sink_id, **kwargs)
 
+    @staticmethod
+    def _get_related_message(generic_message):
+        return generic_message.wirepas.set_scratchpad_target_and_action_resp
+
     @classmethod
     def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException("Cannot parse SetScratchpadTargetAndActionResponse payload")
-
-        response = message.wirepas.set_scratchpad_target_and_action_resp
+        response = cls._decode_and_get_related_message(payload)
 
         d = Response._parse_response_header(response.header)
 
@@ -149,7 +146,7 @@ class SetScratchpadTargetAndActionResponse(Response):
     def payload(self):
         message = GenericMessage()
 
-        response = message.wirepas.set_scratchpad_target_and_action_resp
+        response = self._get_related_message(message)
         self._load_response_header(response)
 
         return message.SerializeToString()

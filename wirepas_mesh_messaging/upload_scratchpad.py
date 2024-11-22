@@ -11,7 +11,6 @@ from .proto import GenericMessage
 
 from .request import Request
 from .response import Response
-from .wirepas_exceptions import GatewayAPIParsingException
 
 
 class UploadScratchpadRequest(Request):
@@ -34,18 +33,13 @@ class UploadScratchpadRequest(Request):
         self.scratchpad = scratchpad
         self.chunk_info = chunk_info
 
+    @staticmethod
+    def _get_related_message(generic_message):
+        return generic_message.wirepas.upload_scratchpad_req
+
     @classmethod
     def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException(
-                "Cannot parse UploadScratchpadRequest payload"
-            )
-
-        req = message.wirepas.upload_scratchpad_req
+        req = cls._decode_and_get_related_message(payload)
 
         d = Request._parse_request_header(req.header)
         if req.HasField("scratchpad"):
@@ -67,7 +61,7 @@ class UploadScratchpadRequest(Request):
         message = GenericMessage()
 
         # Fill the request header
-        req = message.wirepas.upload_scratchpad_req
+        req = self._get_related_message(message)
         self._load_request_header(req)
 
         req.seq = self.seq
@@ -98,18 +92,13 @@ class UploadScratchpadResponse(Response):
             req_id, gw_id, res, sink_id, **kwargs
         )
 
+    @staticmethod
+    def _get_related_message(generic_message):
+        return generic_message.wirepas.upload_scratchpad_resp
+
     @classmethod
     def from_payload(cls, payload):
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException(
-                "Cannot parse UploadScratchpadResponse payload"
-            )
-
-        response = message.wirepas.upload_scratchpad_resp
+        response = cls._decode_and_get_related_message(payload)
 
         d = Response._parse_response_header(response.header)
 
@@ -119,7 +108,7 @@ class UploadScratchpadResponse(Response):
     def payload(self):
         message = GenericMessage()
 
-        response = message.wirepas.upload_scratchpad_resp
+        response = self._get_related_message(message)
         self._load_response_header(response)
 
         return message.SerializeToString()

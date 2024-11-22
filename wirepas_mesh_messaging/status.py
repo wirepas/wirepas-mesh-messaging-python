@@ -11,7 +11,6 @@ import enum
 from .proto import GenericMessage, ON, OFF
 
 from .event import Event
-from .wirepas_exceptions import GatewayAPIParsingException
 
 # Indicates that protobuf message definition in version 1 can be parsed by this implementation
 # This API should never be changes in future (purpose of protobuf)
@@ -75,17 +74,15 @@ class StatusEvent(Event):
         self.gateway_version = gateway_version
         self.max_scratchpad_size = max_scratchpad_size
 
+    @staticmethod
+    def _get_related_message(generic_message):
+        return generic_message.wirepas.status_event
+
     @classmethod
     def from_payload(cls, payload):
         """ Converts a protobuff message into a python object """
-        message = GenericMessage()
-        try:
-            message.ParseFromString(payload)
-        except Exception:
-            # Any Exception is promoted to Generic API exception
-            raise GatewayAPIParsingException("Cannot parse StatusEvent payload")
 
-        event = message.wirepas.status_event
+        event = cls._decode_and_get_related_message(payload)
 
         if event.state == ON:
             online = GatewayState.ONLINE
@@ -138,7 +135,7 @@ class StatusEvent(Event):
 
         message = GenericMessage()
         # Fill the request header
-        status = message.wirepas.status_event
+        status = self._get_related_message(message)
         self._load_event_header(status)
 
         status.version = PB_MESSAGE_DEFINITION_VERSION
