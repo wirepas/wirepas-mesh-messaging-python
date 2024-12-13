@@ -43,9 +43,13 @@ class SetConfigRequest(Request):
                     cipher_key (bytearray)
                     authentication_key (bytearray)
                     started (bool)
+                    configuration_data_content (list): see below note for contents
 
                 Note: app_config_data/app_config_seq/app_config_data must all be defined to change one of them
                       only relevant keys for new config has to be defined
+                Note: configuration_data_content should contain dicts with the following keys:
+                      endpoint (int)
+                      payload (bytearray)
         req_id (int): unique request id
 
     """
