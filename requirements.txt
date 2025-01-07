@@ -1,2 +1,0 @@
-# Minimum of 3.19 as protoc useed needed it
-protobuf>=3.19.2
