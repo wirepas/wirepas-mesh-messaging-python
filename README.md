@@ -16,9 +16,32 @@ This package is available from [PyPi][pypi].
 
 ### From the source
 
-This wheel can be built from source directly.
-Flow will be described here but can already be seen from this repository [Github action](.github/workflows/python-package.yml).
+This wheel can be built from source directly. You need to have [protobuf
+compiler](https://grpc.io/docs/protoc-installation/) installed.
 
+First, .proto files should be compiled
+```shell
+protoc -I backend-apis/gateway_to_backend/protocol_buffers_files/ \
+    --python_out=./wirepas_mesh_messaging/proto \
+     backend-apis/gateway_to_backend/protocol_buffers_files/*.proto
+```
+
+After that, the wheel can be built using [build](https://pypi.org/project/build/).
+```shell
+python3 -m build .
+```
+
+**Note:** When installing the package,
+[protobuf](https://pypi.org/project/protobuf/) is installed automatically as a
+dependency. On some environments (such as Alpine) the [recommended UPB
+backend](https://github.com/protocolbuffers/protobuf/tree/main/python#implementation-backends)
+might not available as a binary and the system might use the slower python
+implementation. To get the UBP backend, you can configure pip to use the source
+version of protobuf. This way the UPB backend would be built when installing
+protobuf:
+```shell
+pip install . --no-binary protobuf
+```
 ## Usage example
 
 ### Create a message to be sent to a Gateway in protobuf format
