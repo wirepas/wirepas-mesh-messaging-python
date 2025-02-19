@@ -9,6 +9,7 @@
 
 import enum
 from .proto import GenericMessage, ON, OFF
+from .gateway_feature import GatewayFeature
 
 from .event import Event
 
@@ -52,6 +53,8 @@ class StatusEvent(Event):
         sink_configs (list): list of dictionnary containing the sink configs
         gateway_model (string): gateway model
         gateway_version (string): gateway version
+        max_scratchpad_size (int): maximum scratchpad size
+        gateway_features (list): list of GatewayFeature objects for supported features
     """
 
     def __init__(
@@ -64,6 +67,7 @@ class StatusEvent(Event):
         gateway_model=None,
         gateway_version=None,
         max_scratchpad_size=None,
+        gateway_features=None,
         **kwargs
     ):
         super(StatusEvent, self).__init__(gw_id, event_id=event_id, **kwargs)
@@ -73,6 +77,7 @@ class StatusEvent(Event):
         self.gateway_model = gateway_model
         self.gateway_version = gateway_version
         self.max_scratchpad_size = max_scratchpad_size
+        self.gateway_features = gateway_features if gateway_features else []
 
     @staticmethod
     def _get_related_message(generic_message):
@@ -119,6 +124,10 @@ class StatusEvent(Event):
                 # First config
                 configs = [config]
 
+        gateway_features = []
+        for gateway_feature in event.gw_features:
+            gateway_features.append(GatewayFeature(gateway_feature))
+
         d = Event._parse_event_header(event.header)
         return cls(d["gw_id"],
                    online,
@@ -127,7 +136,8 @@ class StatusEvent(Event):
                    time_ms_epoch=d["time_ms_epoch"],
                    gateway_model=gw_model,
                    gateway_version=gw_version,
-                   max_scratchpad_size=max_scratchpad_size)
+                   max_scratchpad_size=max_scratchpad_size,
+                   gateway_features=gateway_features)
 
     @property
     def payload(self):
@@ -161,5 +171,8 @@ class StatusEvent(Event):
 
         if self.max_scratchpad_size is not None:
             status.max_scratchpad_size = self.max_scratchpad_size
+
+        for gateway_feature in self.gateway_features:
+            status.gw_features.append(gateway_feature.value)
 
         return message.SerializeToString()

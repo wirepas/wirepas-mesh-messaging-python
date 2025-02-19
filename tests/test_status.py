@@ -1,5 +1,6 @@
 # flake8: noqa
 
+import pytest
 import wirepas_mesh_messaging
 from default_value import *
 
@@ -28,3 +29,22 @@ def test_generate_parse_event_with_max_size():
 
     for k, v in status.__dict__.items():
         assert v == status2.__dict__[k]
+
+def test_generate_parse_event_with_feature_flags():
+    gw_features = [
+        wirepas_mesh_messaging.GatewayFeature.GW_FEATURE_SCRATCHPAD_CHUNK_V1,
+        wirepas_mesh_messaging.GatewayFeature.GW_FEATURE_CONFIGURATION_DATA_V1
+    ]
+    status = wirepas_mesh_messaging.StatusEvent(GATEWAY_ID, GATEWAY_STATE, gateway_features=gw_features)
+
+    status_parsed = wirepas_mesh_messaging.StatusEvent.from_payload(status.payload)
+
+    for k, v in status.__dict__.items():
+        assert v == status_parsed.__dict__[k]
+
+def test_encoding_message_with_invalid_feature_flag():
+    status = wirepas_mesh_messaging.StatusEvent(GATEWAY_ID, GATEWAY_STATE, gateway_features=["INVALID_VALUE12345"])
+
+    with pytest.raises(Exception):
+        status.payload
+
