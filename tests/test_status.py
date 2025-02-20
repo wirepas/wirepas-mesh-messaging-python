@@ -19,6 +19,7 @@ def test_generate_parse_event_complete():
 
     status2 = wirepas_mesh_messaging.StatusEvent.from_payload(status.payload)
 
+    assert DUMMY_CONFIGS == status2.sink_configs
     for k, v in status.__dict__.items():
         assert v == status2.__dict__[k]
 
