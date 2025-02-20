@@ -8,6 +8,7 @@
 """
 
 from .proto import GenericMessage
+from .gateway_feature import GatewayFeature
 
 from .request import Request
 from .response import Response
@@ -58,6 +59,7 @@ class GetGatewayInfoResponse(Response):
         gateway_version (string): gateway version (managed by gateway integrator)
         max_scratchpad_size (int): max scratchpad size gateway support.
              If bigger, transfer must happen as chunks, if None it is unlimited
+        gateway_features (list): list of GatewayFeature objects for supported features
     """
 
     def __init__(
@@ -69,6 +71,7 @@ class GetGatewayInfoResponse(Response):
         gateway_model=None,
         gateway_version=None,
         max_scratchpad_size=None,
+        gateway_features=None,
         implemented_api_version=None,
         **kwargs
     ):
@@ -78,6 +81,7 @@ class GetGatewayInfoResponse(Response):
         self.gateway_version = gateway_version
         self.implemented_api_version = implemented_api_version
         self.max_scratchpad_size = max_scratchpad_size
+        self.gateway_features = gateway_features if gateway_features else []
 
     @staticmethod
     def _get_related_message(generic_message):
@@ -93,6 +97,10 @@ class GetGatewayInfoResponse(Response):
         if max_size == 0:
             max_size = None
 
+        gateway_features = []
+        for gateway_feature in response.info.gw_features:
+            gateway_features.append(GatewayFeature(gateway_feature))
+
         return cls(
             d["req_id"],
             d["gw_id"],
@@ -102,6 +110,7 @@ class GetGatewayInfoResponse(Response):
             gateway_version=response.info.gw_version,
             implemented_api_version=response.info.implemented_api_version,
             max_scratchpad_size=max_size,
+            gateway_features=gateway_features,
             time_ms_epoch=d["time_ms_epoch"]
         )
 
@@ -125,5 +134,8 @@ class GetGatewayInfoResponse(Response):
 
         if self.max_scratchpad_size is not None:
             response.info.max_scratchpad_size = self.max_scratchpad_size
+
+        for gateway_feature in self.gateway_features:
+            response.info.gw_features.append(gateway_feature.value)
 
         return message.SerializeToString()

@@ -24,6 +24,11 @@ NETWORK_ADDRESS = 0x123456
 
 IMPLEMENTED_API_VERSION = 0
 
+TEST_CDC1 = [
+    { "endpoint": 1,       "payload": bytes.fromhex("AABBCCDDEEFF") },
+    { "endpoint": 0x20000, "payload": bytes.fromhex("334455") },
+]
+
 # Todo add more fields in config
 NODE_CONFIG_1 = dict([("sink_id", SINK_ID), ("node_address", 123)])
 
@@ -55,5 +60,6 @@ NODE_CONFIG_2 = dict(
      ("stored_type", SCRATCHPAD_TYPE),
      ("stored_status", SCRATCHPAD_STATUS),
      ("processed_scratchpad", SCRATCHPAD_INFO),
-     ("stored_scratchpad", SCRATCHPAD_INFO)
+     ("stored_scratchpad", SCRATCHPAD_INFO),
+     ("configuration_data_content", TEST_CDC1)
     ])

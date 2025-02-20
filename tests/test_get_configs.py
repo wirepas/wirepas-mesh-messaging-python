@@ -26,5 +26,7 @@ def test_generate_parse_response():
         request.payload
     )
 
+    assert DUMMY_CONFIGS == request2.configs
     for k, v in request.__dict__.items():
         assert v == request2.__dict__[k]
+

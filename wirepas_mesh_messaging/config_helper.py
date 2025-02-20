@@ -7,7 +7,7 @@
         See file LICENSE for full license details.
 """
 
-from .proto import ON, OFF, NodeRole
+from .proto import ON, OFF, NodeRole, ConfigurationDataItem
 
 from .otap_helper import (
     set_scratchpad_info,
@@ -308,6 +308,10 @@ def parse_config_ro(message_obj, dic):
             message_obj.firmware_version.dev,
         ]
 
+    for cdc_item in message_obj.configuration_data_content:
+        cdc = dic.setdefault("configuration_data_content", [])
+        cdc.append({"endpoint": cdc_item.endpoint, "payload": cdc_item.payload})
+
 
 def set_config_ro(message_obj, dic):
     """
@@ -342,3 +346,10 @@ def set_config_ro(message_obj, dic):
     except KeyError:
         # Field is unknown, just skip it
         pass
+
+    for cdc_definition in dic.get("configuration_data_content", []):
+        cdc_item = ConfigurationDataItem()
+        cdc_item.endpoint = cdc_definition["endpoint"]
+        cdc_item.payload = cdc_definition["payload"]
+        message_obj.configuration_data_content.append(cdc_item)
+
