@@ -243,33 +243,39 @@ def set_config_otap(message_obj, dic):
         set_scratchpad_target(message_obj.target_and_action, dic["target_and_action"])
 
 
-def parse_config_keys(message_obj, dic):
+def parse_config_wo(message_obj, dic):
     """
-    Parses network keys.
+    Parses the message_obj for write only (wo) fields and copies them into
+    dic.
 
-    The keys are only available on a SinkNewConfig message.
+    Write only fields are ones that are only available on a SinkNewConfig
+    message.
 
     Args:
         message_obj (proto): protocol buffer object
-        dic (dict): the dictionary where to copy the keys into
+        dic (dict): the dictionary where to copy the wo fields
+
     """
 
     parse_optional_field(message_obj.keys, "cipher", dic, "cipher_key")
     parse_optional_field(message_obj.keys, "authentication", dic, "authentication_key")
 
 
-def set_config_keys(message_obj, dic):
+def set_config_wo(message_obj, dic):
     """
-    Sets network keys.
+    Sets the message_obj with the write only (wo) fields present in dic.
 
-    The keys are only available on a SinkNewConfig message.
+    Write only fields are ones that are only available on a SinkNewConfig
+    message.
 
     Args:
         message_obj (proto): protocol buffer object
-        dic (dict): the dictionary where to copy the keys from
+        dic (dict): the dictionary where to copy the wo fields from
+
     """
-    set_optional_field(message_obj, "cipher", dic, "cipher_key")
-    set_optional_field(message_obj, "authentication", dic, "authentication_key")
+
+    set_optional_field(message_obj.keys, "cipher", dic, "cipher_key")
+    set_optional_field(message_obj.keys, "authentication", dic, "authentication_key")
 
 
 def parse_config_ro(message_obj, dic):
