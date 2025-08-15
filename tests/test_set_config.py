@@ -43,3 +43,17 @@ def test_generate_parse_response_with_readonly_fields():
     for k, v in request.__dict__.items():
         assert v == request2.__dict__[k]
 
+
+def test_generate_parse_request_with_writeable_fields():
+    request = wirepas_mesh_messaging.SetConfigRequest(
+        SINK_ID, NODE_CONFIG_FOR_SETTING, REQUEST_ID
+    )
+
+    request2 = wirepas_mesh_messaging.SetConfigRequest.from_payload(
+        request.payload
+    )
+
+    assert NODE_CONFIG_FOR_SETTING == request2.new_config
+    for k, v in request.__dict__.items():
+        assert v == request2.__dict__[k]
+

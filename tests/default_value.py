@@ -63,3 +63,19 @@ NODE_CONFIG_2 = dict(
      ("stored_scratchpad", SCRATCHPAD_INFO),
      ("configuration_data_content", TEST_CDC1)
     ])
+
+NODE_CONFIG_FOR_SETTING = {
+    "sink_id": SINK_ID,
+    "node_role": 1,
+    "node_address": 1516,
+    "network_address": 879123,
+    "network_channel": 7,
+    "app_config_diag": 30,
+    "app_config_seq": 300,
+    "app_config_data": bytes.fromhex("90807060"),
+    "channel_map": 120,
+    "cipher_key": bytes.fromhex("102030"),
+    "authentication_key": bytes.fromhex("AABBCC"),
+    "started": True
+}
+
