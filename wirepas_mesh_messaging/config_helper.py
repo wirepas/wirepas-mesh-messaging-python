@@ -260,6 +260,20 @@ def parse_config_wo(message_obj, dic):
     parse_optional_field(message_obj.keys, "cipher", dic, "cipher_key")
     parse_optional_field(message_obj.keys, "authentication", dic, "authentication_key")
 
+    if message_obj.HasField("network_keys"):
+        dic["network_keys"] = {
+            "cipher": message_obj.network_keys.cipher,
+            "authentication": message_obj.network_keys.authentication,
+            "sequence": message_obj.network_keys.sequence
+        }
+
+    if message_obj.HasField("management_keys"):
+        dic["management_keys"] = {
+            "cipher": message_obj.management_keys.cipher,
+            "authentication": message_obj.management_keys.authentication,
+            "sequence": message_obj.management_keys.sequence
+        }
+
 
 def set_config_wo(message_obj, dic):
     """
@@ -276,6 +290,16 @@ def set_config_wo(message_obj, dic):
 
     set_optional_field(message_obj.keys, "cipher", dic, "cipher_key")
     set_optional_field(message_obj.keys, "authentication", dic, "authentication_key")
+
+    if "network_keys" in dic:
+        message_obj.network_keys.cipher = dic["network_keys"]["cipher"]
+        message_obj.network_keys.authentication = dic["network_keys"]["authentication"]
+        message_obj.network_keys.sequence = dic["network_keys"]["sequence"]
+
+    if "management_keys" in dic:
+        message_obj.management_keys.cipher = dic["management_keys"]["cipher"]
+        message_obj.management_keys.authentication = dic["management_keys"]["authentication"]
+        message_obj.management_keys.sequence = dic["management_keys"]["sequence"]
 
 
 def parse_config_ro(message_obj, dic):

@@ -76,6 +76,16 @@ NODE_CONFIG_FOR_SETTING = {
     "channel_map": 120,
     "cipher_key": bytes.fromhex("102030"),
     "authentication_key": bytes.fromhex("AABBCC"),
-    "started": True
+    "started": True,
+    "network_keys": {
+        "cipher": bytes.fromhex("5000"),
+        "authentication": bytes.fromhex("6000"),
+        "sequence": 6767
+    },
+    "management_keys": {
+        "cipher": bytes.fromhex("10AA"),
+        "authentication": bytes.fromhex("20BB"),
+        "sequence": 520
+    },
 }
 

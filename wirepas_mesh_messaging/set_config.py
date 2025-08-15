@@ -43,6 +43,14 @@ class SetConfigRequest(Request):
                     cipher_key (bytearray)
                     authentication_key (bytearray)
                     started (bool)
+                    network_keys (dict): with following required keys:
+                        cipher (bytearray)
+                        authentication (bytearray)
+                        sequence (int)
+                    management_keys (dict): with following required keys:
+                        cipher (bytearray)
+                        authentication (bytearray)
+                        sequence (int)
 
                 Note: app_config_data/app_config_seq/app_config_data must all be defined to change one of them
                       only relevant keys for new config has to be defined
