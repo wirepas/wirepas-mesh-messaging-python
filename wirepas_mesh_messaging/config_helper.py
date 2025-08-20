@@ -243,7 +243,7 @@ def set_config_otap(message_obj, dic):
         set_scratchpad_target(message_obj.target_and_action, dic["target_and_action"])
 
 
-def parse_config_wo(message_obj, dic):
+def parse_config_wo_fields(message_obj, dic):
     """
     Parses the message_obj for write only (wo) fields and copies them into
     dic.
@@ -275,7 +275,7 @@ def parse_config_wo(message_obj, dic):
         }
 
 
-def set_config_wo(message_obj, dic):
+def set_config_wo_fields(message_obj, dic):
     """
     Sets the message_obj with the write only (wo) fields present in dic.
 

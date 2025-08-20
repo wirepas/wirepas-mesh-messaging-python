@@ -19,8 +19,8 @@ from .config_helper import (
     parse_config_otap,
     set_config_otap,
     set_config_ro,
-    set_config_wo,
-    parse_config_wo,
+    set_config_wo_fields,
+    parse_config_wo_fields,
 )
 
 
@@ -79,7 +79,7 @@ class SetConfigRequest(Request):
         new_config = {}
         new_config["sink_id"] = req.config.sink_id
         parse_config_rw(req.config, new_config)
-        parse_config_wo(req.config, new_config)
+        parse_config_wo_fields(req.config, new_config)
 
         return cls(req.config.sink_id, new_config, d["req_id"], time_ms_epoch=d["time_ms_epoch"])
 
@@ -92,7 +92,7 @@ class SetConfigRequest(Request):
 
         set_config.config.sink_id = self.sink_id
         set_config_rw(set_config.config, self.new_config)
-        set_config_wo(set_config.config, self.new_config)
+        set_config_wo_fields(set_config.config, self.new_config)
 
         return message.SerializeToString()
 
