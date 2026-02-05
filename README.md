@@ -76,7 +76,7 @@ b'\n\x1e2\x1c\n\x0b\x08\x8e\xac\x9c\xbf\xab\x95\xbd\xf6\xfe\x01\x10\xd2\t\x18\n 
 ## Services API documentation
 
 Please refer to the [backend apis repository][github_backend_apis] for
-documentation on the [Gateway to Backend API](https://github.com/wirepas/backend-apis/blob/scratchpad_target/gateway_to_backend/README.md).
+documentation on the [Gateway to Backend API](https://github.com/wirepas/backend-apis/blob/master/gateway_to_backend/README.md).
 
 
 ## License
