@@ -43,6 +43,6 @@ setup(
     keywords=about["__keywords__"],
     packages=find_packages(exclude=["contrib", "docs", "tests", "examples"]),
     install_requires=[
-        "protobuf~=6.31.1"
+        "protobuf~=6.33.5"
     ]
 )
