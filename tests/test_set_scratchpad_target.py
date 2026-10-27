@@ -142,3 +142,15 @@ def test_decoding_request_with_too_large_target_crc_should_fail_with_correct_exc
     assert exc_info.value.header["req_id"] == REQUEST_ID
     assert exc_info.value.header["sink_id"] == SINK_ID_2
     assert exc_info.value.header["time_ms_epoch"] == TEST_TIME
+
+def test_generate_parse_request_with_inventory_mode():
+    request = wirepas_mesh_messaging.SetScratchpadTargetAndActionRequest(
+        SINK_ID, {"action": wirepas_mesh_messaging.ScratchpadAction.ACTION_INVENTORY_MODE}, REQUEST_ID
+    )
+
+    request2 = wirepas_mesh_messaging.SetScratchpadTargetAndActionRequest.from_payload(
+        request.payload
+    )
+
+    for k, v in request.__dict__.items():
+        assert v == request2.__dict__[k]
